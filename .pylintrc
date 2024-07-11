@@ -319,7 +319,7 @@ min-public-methods=2
 [EXCEPTIONS]
 
 # Exceptions that will emit a warning when caught.
-overgeneral-exceptions=builtins.BaseException,builtins.Exception
+overgeneral-exceptions=builtins.BaseException
 
 
 [FORMAT]
@@ -351,6 +351,7 @@ single-line-class-stmt=no
 # else.
 single-line-if-stmt=no
 
+good-names=e,f
 
 [IMPORTS]
 

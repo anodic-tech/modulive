@@ -1,18 +1,29 @@
-""" ControlSurface script container """
-
+""" . """
 import os
 import logging
 from _Framework.ControlSurface import ControlSurface # type: ignore
+from .utils import catch_exception
+from .socket import Socket
 
 logger = logging.getLogger("modulive")
 
 class Modulive(ControlSurface):
     """ The entry point to the control surface script. Defines available actions. """
 
+    @catch_exception
     def __init__(self, *a, **k):
         super().__init__(*a, **k)
         self.start_logging()
+
         self.log("Initializing Modulive...")
+
+        with self.component_guard():
+            self._register_component(Socket())
+
+
+    def get_state(self):
+        """ Returns a dictionary representation of the application state """
+        return {}
 
     def start_logging(self):
         """ If a local log doesn't exist create one. 
@@ -22,18 +33,18 @@ class Modulive(ControlSurface):
         if not os.path.exists(log_dir):
             os.mkdir(log_dir, 0o755)
         log_path = os.path.join(log_dir, "modulive.log")
-        open(log_path, 'w').close()
+        open(log_path, 'w').close() # pylint: disable=consider-using-with,unspecified-encoding
         self.log_file_handler = logging.FileHandler(log_path)
         formatter = logging.Formatter("(%(asctime)s) [%(levelname)s] %(message)s")
         self.log_file_handler.setFormatter(formatter)
         logger.addHandler(self.log_file_handler)
 
-    def disconnect(self):
-        """ Cleanup """
-        self.log("Disconnecting Modulive...")
-        logger.removeHandler(self.log_file_handler)
-        super().disconnect()
-
     def log(self, message):
         """ Log locally and to Ableton Log.txt """
         logger.info(message)
+
+    def disconnect(self):
+        """ Cleanup """
+        self.log("Disconnecting Modulive...")
+        super().disconnect()
+        logger.removeHandler(self.log_file_handler)
