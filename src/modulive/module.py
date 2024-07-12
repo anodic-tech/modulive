@@ -10,7 +10,7 @@ class Module(ModuliveComponent):
         super().__init__()
 
         self.name = get_name(track.name)
-        self.log(f"Creating Module [{self.name}]...")
+        self._log(f"Creating Module [{self.name}]...")
 
         self._tracks = get_children(track, self.canonical_parent.song().tracks)
-        self.log(f'Tracks: {list(map(lambda t: t.name, self._tracks))}')
+        self._log(f'Tracks: {list(map(lambda t: t.name, self._tracks))}')

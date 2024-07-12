@@ -13,7 +13,7 @@ class Socket(ModuliveComponent):
     def __init__(self):
         super().__init__()
 
-        self.log('Opening Socket...')
+        self._log('Opening Socket...')
 
         self._socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         self._socket.setblocking(0)
@@ -29,10 +29,11 @@ class Socket(ModuliveComponent):
         """ Bind the socket to the LOCAL_ADDRESS port """
         try:
             self._socket.bind(LOCAL_ADDRESS)
-            self.log('Starting on: ' + str(LOCAL_ADDRESS) + ', remote addr: ' + str(REMOTE_ADDRESS))
+            self._log('Starting on: ' + str(LOCAL_ADDRESS) +
+                      ', remote addr: ' + str(REMOTE_ADDRESS))
         except Exception:
             msg = 'ERROR: Cannot bind to ' + str(LOCAL_ADDRESS) + ', port in use. Trying again...'
-            self.log(msg)
+            self._error(msg)
             timer = Timer(5, self.bind)
             timer.start()
 
@@ -55,7 +56,7 @@ class Socket(ModuliveComponent):
                 {"event": "error", "data": str(type(e).__name__) + ': ' + str(e.args)},
                 default=json_replace, ensure_ascii=False).encode(),
                 REMOTE_ADDRESS)
-            self.log("Socket Error " + name + ": " + str(e))
+            self._error("Socket Error " + name + ": " + str(e))
 
     def process(self):
         """ Check socket for received data and handle """
@@ -67,20 +68,23 @@ class Socket(ModuliveComponent):
         except socket.error:
             return
         except Exception as e:
-            self.log("Error: " + str(e.args))
+            self._error("Error: " + str(e.args))
 
     def input_handler(self, payload):
         """ If received payload requests state, get state from Modulive and return"""
         if payload['event'] == 'get_state':
             try:
                 state = self.canonical_parent.get_state()
-                self.log(state)
                 self.send('give_state', state)
             except Exception as e:
-                self.log("Error: " + str(e.args))
+                self._error("Error: " + str(e.args))
 
     def disconnect(self):
         """ Close socket upon disconnect """
-        self.log("Closing Socket...")
-        self._socket.close()
+        self._log("Closing Socket...")
+        try:
+            self._socket.close()
+            self._socket = None
+        except AttributeError:
+            self._error("Socket already closed")
         super().disconnect()

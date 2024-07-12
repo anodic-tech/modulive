@@ -1,12 +1,12 @@
 """ . """
-import logging
-from _Framework.ControlSurface import ControlSurface # type: ignore
+from modulive.modulive_surface import ModuliveSurface
 
-logger = logging.getLogger("modulive")
-
-class ModuliveMFT(ControlSurface):
-    """ The entry point to the control surface script. Defines available actions. """
+class ModuliveMFT(ModuliveSurface):
+    """ Modulive - MIDI Fighter Twister Integration """
 
     def __init__(self, *a, **k):
-        super().__init__(*a, **k)
-        logger.info("Initializing Modulive-MidiFighterTwister Integration...")
+        super().__init__(name="ModuliveMFT", *a, **k)
+
+    def _update_mapping(self):
+        """ Get params from Modulive """
+        self._log(self.modulive.get_active_params('A'))

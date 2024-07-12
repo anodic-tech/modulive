@@ -13,7 +13,7 @@ def catch_exception(f):
         try:
             return f(*args, **kwargs)
         except: # pylint: disable=bare-except
-            args[0].log(traceback.format_exc())
+            logger.error(traceback.format_exc())
     return func
 
 def get_type(s):

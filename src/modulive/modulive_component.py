@@ -4,9 +4,13 @@ from _Framework.ControlSurfaceComponent import ControlSurfaceComponent # type: i
 
 logger = logging.getLogger("modulive")
 
-class ModuliveComponent(ControlSurfaceComponent):
+class ModuliveComponent(ControlSurfaceComponent): # pylint: disable=too-few-public-methods
     """ Extendable component providing Modulive specific methods."""
 
-    def log(self, message):
-        """ Call log via Modulive ControlSurface """
+    def _log(self, message):
+        """ Call log """
         logger.info(message)
+
+    def _error(self, message):
+        """ Call error """
+        logger.error(message)

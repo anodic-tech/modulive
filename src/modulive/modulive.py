@@ -12,27 +12,32 @@ logger = logging.getLogger("modulive")
 class Modulive(ControlSurface):
     """ The entry point to the control surface script. Defines available actions. """
 
+    IS_MODULIVE = True
+
     @catch_exception
     def __init__(self, *a, **k):
         super().__init__(*a, **k)
-        self.start_logging()
+        self._start_logging()
 
-        self.log("Initializing Modulive...")
+        self._log("Initializing Modulive...")
 
         self._modules = []
+        self.active_modules = {
+            'A': None,
+            'B': None
+        }
 
         with self.component_guard():
-            self._register_component(Socket())
+            self._socket = Socket()
             self._build()
 
+        self._mapping_listeners = []
 
     def _build(self):
         """ Iterate through tracks and build Module components """
         for track in self.song().tracks:
             if get_type(track.name) is Types.MODULE:
-                module = Module(track)
-                self._register_component(module)
-                self._modules.append(module)
+                self._modules.append(Module(track))
 
     def get_state(self):
         """ Returns a dictionary representation of the application state """
@@ -40,7 +45,25 @@ class Modulive(ControlSurface):
             'modules': list(map(lambda m: m.name, self._modules))
         }
 
-    def start_logging(self):
+    def get_active_params(self, active_module):
+        """ Return a list of active Ableton Parameters for module A or B """
+        self._log(active_module)
+        return [1,2,3]
+
+    def _update_mapping(self):
+        """ Call all callback functions in _mapping_listeners """
+        for callback in self._mapping_listeners:
+            callback()
+
+    def add_mapping_listener(self, callback):
+        """ Add a callback function to _mapping_listeners """
+        self._mapping_listeners.append(callback)
+
+    def remove_mapping_listener(self, callback):
+        """ Remove a callback function to _mapping_listeners """
+        self._mapping_listeners.remove(callback)
+
+    def _start_logging(self):
         """ If a local log doesn't exist create one. 
         Wipe the log clean. Add associated file handler to the logger. """
         module_path = os.path.dirname(os.path.realpath(__file__))
@@ -54,12 +77,13 @@ class Modulive(ControlSurface):
         self.log_file_handler.setFormatter(formatter)
         logger.addHandler(self.log_file_handler)
 
-    def log(self, message):
+    def _log(self, message):
         """ Log locally and to Ableton Log.txt """
         logger.info(message)
 
+    @catch_exception
     def disconnect(self):
         """ Cleanup """
-        self.log("Disconnecting Modulive...")
+        self._log("Disconnecting Modulive...")
         super().disconnect()
         logger.removeHandler(self.log_file_handler)
