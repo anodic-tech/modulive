@@ -13,7 +13,7 @@ class Socket(ModuliveComponent):
     def __init__(self):
         super().__init__()
 
-        self.log('Opening Socket')
+        self.log('Opening Socket...')
 
         self._socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         self._socket.setblocking(0)
@@ -74,6 +74,7 @@ class Socket(ModuliveComponent):
         if payload['event'] == 'get_state':
             try:
                 state = self.canonical_parent.get_state()
+                self.log(state)
                 self.send('give_state', state)
             except Exception as e:
                 self.log("Error: " + str(e.args))
