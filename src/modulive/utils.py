@@ -43,11 +43,16 @@ def get_commands():
     e.g. "{Command1(),Command2()}" returns ["Command1()","Command2()"]
     """
 
-def get_arguments():
+def get_arguments(s):
     """ 
     Return a list of all comma separated values between parentheses in given string 
     e.g. "(Param1,Param2)" returns ["Param1","Param2"]
     """
+    match = re.search(r'\((.*?)\)',s)
+    if match:
+        return match.group(1).split(",")
+    return None
+
 
 def get_children(group_track, all_tracks):
     """ Take a group track and return its child tracks from a list of all tracks

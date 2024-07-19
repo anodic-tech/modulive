@@ -1,6 +1,7 @@
 """ . """
 from .utils import catch_exception, get_children, get_name
 from .modulive_component import ModuliveComponent
+from .section import Section
 
 class Module(ModuliveComponent):
     """ Module component """
@@ -14,3 +15,5 @@ class Module(ModuliveComponent):
 
         self._tracks = get_children(track, self.canonical_parent.song().tracks)
         self._log(f'Tracks: {list(map(lambda t: t.name, self._tracks))}')
+
+        self.sections = [Section()]

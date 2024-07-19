@@ -21,7 +21,7 @@ class Modulive(ControlSurface):
 
         self._log("Initializing Modulive...")
 
-        self._modules = []
+        self.modules = []
         self.active_modules = {
             'A': None,
             'B': None
@@ -37,12 +37,17 @@ class Modulive(ControlSurface):
         """ Iterate through tracks and build Module components """
         for track in self.song().tracks:
             if get_type(track.name) is Types.MODULE:
-                self._modules.append(Module(track))
+                self.modules.append(Module(track))
+        # Temp set first module as active
+        try:
+            self.active_modules['A'] = self.modules[0]
+        except IndexError:
+            self._log('No modules!')
 
     def get_state(self):
         """ Returns a dictionary representation of the application state """
         return {
-            'modules': list(map(lambda m: m.name, self._modules))
+            'modules': list(map(lambda m: m.name, self.modules))
         }
 
     def get_active_params(self, active_module):

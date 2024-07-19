@@ -351,7 +351,7 @@ single-line-class-stmt=no
 # else.
 single-line-if-stmt=no
 
-good-names=e,f,s
+good-names=e,f,s,ab
 
 [IMPORTS]
 

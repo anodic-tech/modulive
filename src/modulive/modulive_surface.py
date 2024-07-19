@@ -21,7 +21,6 @@ class ModuliveSurface(ControlSurface):
         if not self.modulive:
             raise ImportError('Modulive ControlSurface not found')
 
-        self._update_mapping()
         self.modulive.add_mapping_listener(self._update_mapping)
 
     def _update_mapping(self):
