@@ -1,24 +1,27 @@
 """ . """
-from _Framework.ButtonElement import ButtonElement # type: ignore
-from _Framework.SubjectSlot import subject_slot # type: ignore
-from _Framework.InputControlElement import MIDI_NOTE_TYPE, MIDI_NOTE_ON_STATUS # type: ignore
-from _Framework.ControlSurfaceComponent import ControlSurfaceComponent # type: ignore
 from modulive.modulive_surface import ModuliveSurface
 from modulive.utils import catch_exception, get_arguments, get_type
+from modulive_wootingone.module_key import ModuleKey
+from modulive_wootingone.reset_key import ResetKey
+from modulive_wootingone.section_key import SectionKey
 
 KEYS = [
-    {
-        'name': '2',
-        'note': 4,
-        'functions': ['<SECTION_KEY>(A,0)']
-    }
+    {"name": "2", "note": 4, "functions": ["<SECTION_KEY>(A,0)", "<MODULE_KEY>(A,0)"]},
+    {"name": "3", "note": 5, "functions": ["<SECTION_KEY>(A,1)", "<MODULE_KEY>(A,1)"]},
+    {"name": "4", "note": 6, "functions": ["<SECTION_KEY>(A,2)", "<MODULE_KEY>(A,2)"]},
+    {"name": "5", "note": 7, "functions": ["<SECTION_KEY>(A,3)", "<MODULE_KEY>(A,3)"]},
+    {"name": "ctrl", "note": 127, "functions": ["<RESET_KEY>()"]},
 ]
+
+KEY_TYPES = {"SECTION_KEY": SectionKey, "MODULE_KEY": ModuleKey, "RESET_KEY": ResetKey}
+
 
 IN_CHANNEL = 0
 OUT_CHANNEL = 1
 
+
 class ModuliveWootingOne(ModuliveSurface):
-    """ Modulive - WootingOne Integration """
+    """Modulive - WootingOne Integration"""
 
     @catch_exception
     def __init__(self, *a, **k):
@@ -26,76 +29,20 @@ class ModuliveWootingOne(ModuliveSurface):
         with self.component_guard():
             self._key_handlers = []
             for key in KEYS:
-                for func in key['functions']:
+                for func in key["functions"]:
                     type_name = get_type(func)
                     type_params = get_arguments(func)
-                    self._log(type_params)
                     self._key_handlers.append(
-                        KEY_TYPES[type_name](key['name'],key['note'],type_params))
-            self._log(self._components)
+                        KEY_TYPES[type_name](key["name"], key["note"], type_params)
+                    )
+
+            self._update_mapping()
 
     def _update_mapping(self):
-        """ Get params from Modulive """
-        self._log(self.modulive.get_state())
+        """Get params from Modulive"""
         for handler in self._key_handlers:
             handler.handle_state_change()
 
-
-class WootingKey(ControlSurfaceComponent):
-    """ Generic key class """
-
-    @catch_exception
-    def __init__(self,name, note):
-        super().__init__()
-        self._modulive = self.canonical_parent.modulive
-        self._log = self.canonical_parent._log
-        self.note = note
-        self.btn = ButtonElement(True, MIDI_NOTE_TYPE, IN_CHANNEL, note, name=name)
-        self._on_button_value.subject = self.btn
-
-    @subject_slot('value')
-    def _on_button_value(self, value):
-        """ Delegate action once button is triggered """
-        self.canonical_parent._log(value)
-        self._handle_action(value)
-
-    def _handle_action(self, _):
-        """ Default handle action, to be overridden """
-
-
-class SectionKey(WootingKey):
-    """ Section key class """
-
-    @catch_exception
-    def __init__(self, name, key, params):
-        super().__init__(name, key)
-        if len(params) != 2:
-            raise TypeError(f'Invalid SectionKey parameters `{params}`')
-        self.ab = params[0]
-        self.idx = int(params[1])
-
-    @catch_exception
-    def _handle_action(self, value):
-        """ Called on button press, call actions in Modulive """
-        module = self._modulive.active_modules[self.ab]
-        if module:
-            # section = module.sections[self.idx]
-            if value > 0:
-                self._log(f'select SECTION {self.ab}{self.idx}')
-            else:
-                self._log(f'deselect SECTION {self.ab}{self.idx}')
-        #TODO: remove and handle state change from modulive
-        self.handle_state_change()
-
-    def handle_state_change(self):
-        """ Send note to controler to update LED """
-        module = self._modulive.active_modules[self.ab]
-        if module:
-            section = module.sections[self.idx]
-            if section:
-                self.btn.send_midi(
-                    (MIDI_NOTE_ON_STATUS+OUT_CHANNEL, self.note, section.color))
-
-KEY_TYPES = {
-    'SECTION_KEY': SectionKey
-}
+    def refresh_state(self):
+        """Public accessor for mapping update"""
+        self._update_mapping()

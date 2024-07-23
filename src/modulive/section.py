@@ -2,8 +2,9 @@
 from .utils import catch_exception
 from .modulive_component import ModuliveComponent
 
+
 class Section(ModuliveComponent):
-    """ Section component """
+    """Section component"""
 
     @catch_exception
     def __init__(self):
