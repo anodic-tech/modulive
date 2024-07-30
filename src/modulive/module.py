@@ -13,12 +13,11 @@ class Module(ModuliveComponent):
 
         self._track = track
         self._log(f"Creating Module [{self.get_name()}]...")
-        self._log(f"Color: {self.get_color_index()}")
 
         self._child_tracks = get_children(track, self.canonical_parent.song().tracks)
         self._log(f"Tracks: {list(map(lambda t: t.name, self._child_tracks))}")
 
-        self.sections = [Section()]
+        self._sections = []
 
         self._add_name_and_color_listeners()
 
@@ -29,6 +28,20 @@ class Module(ModuliveComponent):
     def get_color_index(self):
         """Get track color index"""
         return self._track.color_index
+
+    def get_section(self, idx):
+        """Get section with index"""
+        if len(self._sections) <= idx:
+            return None
+        return self._sections[idx]
+
+    def activate(self):
+        """Prepare module for performance"""
+        self._log(f"Activating Module [{self.get_name()}]...")
+
+    def deactivate(self):
+        """Disable module"""
+        self._log(f"Dectivating Module [{self.get_name()}]...")
 
     def _add_name_and_color_listeners(self):
         """Broadcast state change on color or name update"""

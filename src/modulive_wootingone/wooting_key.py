@@ -13,21 +13,23 @@ class WootingKey(ControlSurfaceComponent):
     """Generic key class"""
 
     @catch_exception
-    def __init__(self, name, note):
+    def __init__(self, name, note, input_handlers, output_handlers):
         super().__init__()
         self._modulive = self.canonical_parent.modulive
         self._log = self.canonical_parent._log
-        self.note = note
-        self.btn = ButtonElement(True, MIDI_NOTE_TYPE, IN_CHANNEL, note, name=name)
-        self._on_button_value.subject = self.btn
+        self._note = note
+        self._btn = ButtonElement(True, MIDI_NOTE_TYPE, IN_CHANNEL, note, name=name)
+        self._on_button_value.subject = self._btn
+        self._input_handlers = input_handlers
+        self._output_handlers = output_handlers
 
     @subject_slot("value")
     def _on_button_value(self, value):
         """Delegate action once button is triggered"""
-        self._handle_action(value)
-
-    def _handle_action(self, _):
-        """Default handle action, to be overridden"""
+        for handler in self._input_handlers:
+            handler(value=value)
 
     def handle_state_change(self):
         """Default handle state change, to be overridden"""
+        for handler in self._output_handlers:
+            handler(btn=self._btn, note=self._note)

@@ -22,8 +22,8 @@ class Modulive(ControlSurface):
 
         self._log("Initializing Modulive...")
 
-        self.modules = []
-        self.active_modules = {"A": None, "B": None}
+        self._modules = []
+        self._active_modules = {"A": None, "B": None}
 
         self._mapping_listeners = []
 
@@ -32,20 +32,24 @@ class Modulive(ControlSurface):
             self._build_tree()
             self.song().add_tracks_listener(self.rebuild_tree)
 
+    # Build
+
     def _build_tree(self):
         """Iterate through tracks and build virtual tree"""
         for track in self.song().tracks:
             if get_type(track.name) is Types.MODULE:
-                self.modules.append(Module(track))
+                self._modules.append(Module(track))
         self.broadcast_update()
 
     @catch_exception
     def rebuild_tree(self):
         """Disconnect modules and rebuild virtual tree"""
-        for m in self.modules:
+        for m in self._modules:
             m.disconnect()
-        self.modules = []
+        self._modules = []
         self._build_tree()
+
+    # Getters
 
     def get_state(self):
         """Returns a dictionary representation of the application state"""
@@ -53,19 +57,43 @@ class Modulive(ControlSurface):
             "modules": list(
                 map(
                     lambda m: {"name": m.get_name(), "color": m.get_color_index()},
-                    self.modules,
+                    self._modules,
                 )
             )
         }
 
     def get_active_params(self, active_module):
         """Return a list of active Ableton Parameters for module A or B"""
-        self._log(active_module)
         return [1, 2, 3]
+
+    def get_active_module(self, ab):
+        """Return active module, A/B"""
+        return self._active_modules[ab]
+
+    def get_module(self, idx):
+        """Return module of given index"""
+        if len(self._modules) <= idx:
+            return None
+        return self._modules[idx]
+
+    # Actions
+
+    def set_active_module(self, ab, module):
+        """Set active module"""
+        self._log(f"Setting active module: {ab}-{module.get_name()}...")
+        module.activate()
+        self._active_modules[ab] = module
+        self.broadcast_update()
+
+    def unset_active_module(self, ab):
+        """Set active module"""
+        self._active_modules[ab].deactivate()
+        self._active_modules[ab] = None
+
+    # Updates
 
     def broadcast_update(self):
         """Let all listeners know the state has updated"""
-        self._log("state update")
         self._socket.send("message", self.get_state())
         for callback in self._mapping_listeners:
             callback()
@@ -77,6 +105,8 @@ class Modulive(ControlSurface):
     def remove_mapping_listener(self, callback):
         """Remove a callback function to _mapping_listeners"""
         self._mapping_listeners.remove(callback)
+
+    # Logging
 
     def _start_logging(self):
         """If a local log doesn't exist create one.
