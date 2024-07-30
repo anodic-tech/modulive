@@ -9,10 +9,12 @@ logger = logging.getLogger("modulive")
 
 
 @catch_exception
-def handle_module_key_press(modulive, params, value):
+def handle_module_key_press(wooting, modulive, params, value):
     """If the given active module slot is empty, select a module"""
     ab = params[0]
     idx = int(params[1])
+    if "ctrl" in wooting.get_state()["modifiers"]:
+        return
     module = modulive.get_module(idx)
     if value > 0 and module and modulive.get_active_module(ab) is None:
         logger.info(f"select MODULE {ab}{idx}")
@@ -20,7 +22,7 @@ def handle_module_key_press(modulive, params, value):
 
 
 @catch_exception
-def handle_module_key_feedback(modulive, params, btn, note):
+def handle_module_key_feedback(_, modulive, params, btn, note):
     """Send note to controler to update LED"""
     ab = params[0]
     idx = int(params[1])
@@ -29,4 +31,4 @@ def handle_module_key_feedback(modulive, params, btn, note):
         if module:
             btn.send_midi((MIDI_NOTE_ON_STATUS + 2, note, module.get_color_index()))
         else:
-            btn.send_midi((MIDI_NOTE_ON_STATUS + 1, note, 0))
+            btn.send_midi((MIDI_NOTE_ON_STATUS + OUT_CHANNEL, note, 126))

@@ -62,7 +62,7 @@ class Modulive(ControlSurface):
             )
         }
 
-    def get_active_params(self, active_module):
+    def get_active_params(self, ab):
         """Return a list of active Ableton Parameters for module A or B"""
         return [1, 2, 3]
 
@@ -80,7 +80,6 @@ class Modulive(ControlSurface):
 
     def set_active_module(self, ab, module):
         """Set active module"""
-        self._log(f"Setting active module: {ab}-{module.get_name()}...")
         module.activate()
         self._active_modules[ab] = module
         self.broadcast_update()
@@ -89,6 +88,7 @@ class Modulive(ControlSurface):
         """Set active module"""
         self._active_modules[ab].deactivate()
         self._active_modules[ab] = None
+        self.broadcast_update()
 
     # Updates
 
