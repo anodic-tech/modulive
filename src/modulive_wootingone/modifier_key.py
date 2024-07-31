@@ -1,6 +1,6 @@
 """ . """
 import logging
-from _Framework.InputControlElement import MIDI_NOTE_ON_STATUS # type: ignore
+from _Framework.InputControlElement import MIDI_NOTE_ON_STATUS  # type: ignore
 from modulive.utils import catch_exception
 
 OUT_CHANNEL = 1

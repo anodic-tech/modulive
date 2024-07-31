@@ -1,6 +1,6 @@
 """ . """
 import logging
-from _Framework.InputControlElement import MIDI_NOTE_ON_STATUS # type: ignore
+from _Framework.InputControlElement import MIDI_NOTE_ON_STATUS  # type: ignore
 from modulive.utils import catch_exception
 
 OUT_CHANNEL = 1
@@ -35,6 +35,8 @@ def handle_section_key_feedback(_, modulive, params, btn, note):
     if module:
         section = module.get_section(idx)
         if section:
-            btn.send_midi((MIDI_NOTE_ON_STATUS + OUT_CHANNEL, note, section.color))
+            btn.send_midi(
+                (MIDI_NOTE_ON_STATUS + OUT_CHANNEL, note, section.get_color_index())
+            )
         else:
             btn.send_midi((MIDI_NOTE_ON_STATUS + OUT_CHANNEL, note, 127))

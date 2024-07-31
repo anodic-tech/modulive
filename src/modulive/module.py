@@ -1,7 +1,8 @@
 """ . """
-from .utils import catch_exception, get_children, get_name
+from .utils import catch_exception, get_children, get_name, get_type
 from .modulive_component import ModuliveComponent
 from .section import Section
+from .clip_wrapper import ClipWrapper
 
 
 class Module(ModuliveComponent):
@@ -14,10 +15,32 @@ class Module(ModuliveComponent):
         self._track = track
         self._log(f"Creating Module [{self.get_name()}]...")
 
-        self._child_tracks = get_children(track, self.canonical_parent.song().tracks)
+        self._child_tracks = get_children(track, self._song.tracks)
         self._log(f"Tracks: {list(map(lambda t: t.name, self._child_tracks))}")
 
+        # Get config track
+        for child_track in self._child_tracks:
+            if child_track.name == "__CONFIG__":
+                self._config_track = child_track
+        if self._config_track is None:
+            raise Exception("__CONFIG__ track not found")
+
+        self._macro_variations = []
         self._sections = []
+        self._dynamic_clips = []
+
+        for idx, clip_slot in enumerate(self._config_track.clip_slots):
+            if clip_slot.has_clip:
+                config_clip = clip_slot.clip
+                row_type = get_type(config_clip.name) or get_type(
+                    self._song.scenes[idx].name
+                )
+                if row_type == "SECTION":
+                    clips = []
+                    for child_track in self._child_tracks:
+                        if child_track.clip_slots[idx].has_clip:
+                            ClipWrapper(child_track.clip_slots[idx].clip, child_track)
+                    self._sections.append(Section(config_clip, clips))
 
         self._add_name_and_color_listeners()
 
