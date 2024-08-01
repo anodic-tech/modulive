@@ -12,7 +12,7 @@ class Section(ModuliveComponent):
         self._config_clip = config_clip
         self._clips = clips
 
-        self._log(f"Creating Section [{self.get_name()}]...")
+        # self._log(f"Creating Section [{self.get_name()}]...")
 
         self._add_name_and_color_listeners()
 

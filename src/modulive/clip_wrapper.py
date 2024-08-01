@@ -12,7 +12,6 @@ class ClipWrapper(ModuliveComponent):
 
         self._clip = clip
         self._track = track
-        self._log(f"Creating Clip Wrapper [{self.get_name()}]...")
 
         self._add_name_and_color_listeners()
 
