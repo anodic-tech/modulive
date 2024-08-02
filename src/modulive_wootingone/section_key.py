@@ -17,14 +17,12 @@ def handle_section_key_press(wooting, modulive, params, value):
     if module:
         if "ctrl" in wooting.get_state()["modifiers"]:
             modulive.unset_active_module(ab)
-            return
-        section = module.get_section(idx)
-        if section:
-            if value > 0:
-                section.select()
-                logger.info(f"select SECTION {ab}{idx}")
-            else:
-                logger.info(f"deselect SECTION {ab}{idx}")
+        elif "shift" in wooting.get_state()["modifiers"]:
+            module.stop_section(idx)
+        elif value > 0:
+            module.select_section(idx)
+        else:
+            logger.info(f"deselect SECTION {ab}{idx}")
 
 
 @catch_exception

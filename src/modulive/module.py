@@ -97,6 +97,14 @@ class Module(ModuliveComponent):
         """Disable module"""
         self._log(f"Dectivating Module [{self.get_name()}]...")
 
+    def select_section(self, idx):
+        """Select Section at index"""
+        self._sections[idx].select()
+
+    def stop_section(self, idx):
+        """Select Section at index"""
+        self._sections[idx].stop()
+
     def _add_name_and_color_listeners(self):
         """Broadcast state change on color or name update to a track"""
         for track in [self._track] + self._child_tracks:

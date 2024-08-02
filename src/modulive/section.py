@@ -27,6 +27,11 @@ class Section(ModuliveComponent):
         for clip in self._clips:
             clip.select()
 
+    def stop(self):
+        """Stop all clips in section"""
+        for clip in self._clips:
+            clip.stop()
+
     @catch_exception
     def disconnect(self):
         """Remove all listeners and disconnect"""

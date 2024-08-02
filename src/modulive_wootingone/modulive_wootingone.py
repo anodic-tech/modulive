@@ -40,6 +40,7 @@ KEYS = [
     {"name": "o", "note": 18, "functions": ["<SECTION_KEY>(B,6)", "<MODULE_KEY>(B,6)"]},
     {"name": "p", "note": 19, "functions": ["<SECTION_KEY>(B,7)", "<MODULE_KEY>(B,7)"]},
     {"name": "-", "note": 45, "functions": ["<MODULE_INDICATOR_KEY>(B)"]},
+    {"name": "lshift", "note": 125, "functions": ["<MODIFIER_KEY>(shift)"]},
     {"name": "lctrl", "note": 126, "functions": ["<MODIFIER_KEY>(ctrl)"]},
     {"name": "rctrl", "note": 127, "functions": ["<RESET_KEY>()"]},
 ]

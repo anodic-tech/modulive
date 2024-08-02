@@ -25,8 +25,11 @@ class ClipWrapper(ModuliveComponent):
 
     def select(self):
         """Calls clip's select action"""
-        self._log("fire clip")
         self._clip.fire()
+
+    def stop(self):
+        """Calls clip's select action"""
+        self._clip.stop()
 
     def _add_name_and_color_listeners(self):
         """Broadcast state change on color or name update"""
