@@ -23,6 +23,11 @@ class ClipWrapper(ModuliveComponent):
         """Get track color index"""
         return self._clip.color_index
 
+    def select(self):
+        """Calls clip's select action"""
+        self._log("fire clip")
+        self._clip.fire()
+
     def _add_name_and_color_listeners(self):
         """Broadcast state change on color or name update"""
         self._clip.add_name_listener(self._broadcast_update)

@@ -47,7 +47,11 @@ class Module(ModuliveComponent):
                     clips = []
                     for child_track in self._child_tracks:
                         if child_track.clip_slots[idx].has_clip:
-                            ClipWrapper(child_track.clip_slots[idx].clip, child_track)
+                            clips.append(
+                                ClipWrapper(
+                                    child_track.clip_slots[idx].clip, child_track
+                                )
+                            )
                     self._sections.append(Section(config_clip, clips))
 
         self._add_name_and_color_listeners()
