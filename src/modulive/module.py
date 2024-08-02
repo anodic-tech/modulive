@@ -44,7 +44,6 @@ class Module(ModuliveComponent):
                 config_clip = clip_slot.clip
                 row_type = get_type(config_clip.name) or row_type
             if row_type == Types.SECTION:
-                self._log(config_clip)
                 if config_clip:
                     clips = []
                     for child_track in self._child_tracks:

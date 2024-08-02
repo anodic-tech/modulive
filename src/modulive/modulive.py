@@ -2,7 +2,7 @@
 import os
 import logging
 from _Framework.ControlSurface import ControlSurface  # type: ignore
-from .utils import catch_exception, get_type
+from .utils import catch_exception, debounce, get_type
 from .constants import Types
 from .socket import Socket
 from .module import Module
@@ -91,7 +91,7 @@ class Modulive(ControlSurface):
         self.broadcast_update()
 
     # Updates
-
+    @debounce(0.01)
     def broadcast_update(self):
         """Let all listeners know the state has updated"""
         self._socket.send("message", self.get_state())

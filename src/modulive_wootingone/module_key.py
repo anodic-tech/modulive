@@ -2,8 +2,7 @@
 import logging
 from _Framework.InputControlElement import MIDI_NOTE_ON_STATUS  # type: ignore
 from modulive.utils import catch_exception
-
-OUT_CHANNEL = 1
+from modulive_wootingone.constants import Animations
 
 logger = logging.getLogger("modulive")
 
@@ -29,6 +28,12 @@ def handle_module_key_feedback(_, modulive, params, btn, note):
     if modulive.get_active_module(ab) is None:
         module = modulive.get_module(idx)
         if module:
-            btn.send_midi((MIDI_NOTE_ON_STATUS + 2, note, module.get_color_index()))
+            btn.send_midi(
+                (
+                    MIDI_NOTE_ON_STATUS + Animations.MEDIUM,
+                    note,
+                    module.get_color_index(),
+                )
+            )
         else:
-            btn.send_midi((MIDI_NOTE_ON_STATUS + OUT_CHANNEL, note, 126))
+            btn.send_midi((MIDI_NOTE_ON_STATUS + Animations.DIM, note, 126))
