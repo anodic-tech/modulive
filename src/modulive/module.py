@@ -38,12 +38,14 @@ class Module(ModuliveComponent):
     def _build_tree(self):
         """Iterate through tracks and build virtual tree"""
         for idx, clip_slot in enumerate(self._config_track.clip_slots):
+            row_type = get_type(self._song.scenes[idx].name)
+            config_clip = None
             if clip_slot.has_clip:
                 config_clip = clip_slot.clip
-                row_type = get_type(config_clip.name) or get_type(
-                    self._song.scenes[idx].name
-                )
-                if row_type == Types.SECTION:
+                row_type = get_type(config_clip.name) or row_type
+            if row_type == Types.SECTION:
+                self._log(config_clip)
+                if config_clip:
                     clips = []
                     for child_track in self._child_tracks:
                         if child_track.clip_slots[idx].has_clip:
@@ -53,6 +55,8 @@ class Module(ModuliveComponent):
                                 )
                             )
                     self._sections.append(Section(config_clip, clips))
+                else:
+                    self._sections.append(None)
 
         self._add_name_and_color_listeners()
         self._add_clip_listeners()
@@ -99,11 +103,13 @@ class Module(ModuliveComponent):
 
     def select_section(self, idx):
         """Select Section at index"""
-        self._sections[idx].select()
+        if self._sections[idx]:
+            self._sections[idx].select()
 
     def stop_section(self, idx):
         """Select Section at index"""
-        self._sections[idx].stop()
+        if self._sections[idx]:
+            self._sections[idx].stop()
 
     def _add_name_and_color_listeners(self):
         """Broadcast state change on color or name update to a track"""
