@@ -1,6 +1,7 @@
 """ . """
 
 KEYS = [
+    {"name": "~", "note": 53, "functions": ["<GLOBAL_KEY>()"]},
     {"name": "print", "note": 70, "functions": ["<MODULE_INDICATOR_KEY>(A)"]},
     {"name": "2", "note": 31, "functions": ["<SECTION_KEY>(A,0)", "<MODULE_KEY>(A,0)"]},
     {"name": "3", "note": 32, "functions": ["<SECTION_KEY>(A,1)", "<MODULE_KEY>(A,1)"]},

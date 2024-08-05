@@ -107,6 +107,11 @@ class Modulive(ControlSurface):
         self._active_modules[ab] = None
         self.broadcast_update()
 
+    @catch_exception
+    def stop_all(self):
+        """Stop all playing clips"""
+        self.song().stop_all_clips()
+
     # Updates
     @debounce(0.01)
     def broadcast_update(self):
