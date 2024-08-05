@@ -13,6 +13,9 @@ def handle_module_indicator_key_press(wooting, modulive, params, value):
     ab = params[0]
     if "ctrl" in wooting.get_state()["modifiers"] and value > 0:
         modulive.unset_active_module(ab)
+    elif "shift" in wooting.get_state()["modifiers"] and value > 0:
+        module = modulive.get_active_module(ab)
+        if module: module.stop()
 
 
 @catch_exception

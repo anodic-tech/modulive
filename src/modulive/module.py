@@ -99,7 +99,6 @@ class Module(ModuliveComponent):
         self._log(ab)
         self._log(ab == "A")
         if ab == "A":
-            self._log("we in A")
             self._track.mixer_device.crossfade_assign = 0
         elif ab == "B":
             self._track.mixer_device.crossfade_assign = 2
@@ -110,6 +109,10 @@ class Module(ModuliveComponent):
         """Disable module"""
         self._track.mixer_device.crossfade_assign = 1
         self._log(f"Deactivating Module [{self.get_name()}]...")
+
+    def stop(self):
+        """Stop all clips in module"""
+        self._track.stop_all_clips()
 
     def select_section(self, idx):
         """Select Section at index"""
