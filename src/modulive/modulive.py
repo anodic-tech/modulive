@@ -35,7 +35,7 @@ class Modulive(ControlSurface):
     # Build
 
     def _build_tree(self):
-        """Iterate through tracks and build virtual tree"""
+        """Iterate through tracks and build virtual tree. Nonmutative"""
         for track in self.song().tracks:
             if get_type(track.name) is Types.MODULE:
                 self._modules.append(Module(track))
@@ -43,7 +43,7 @@ class Modulive(ControlSurface):
 
     @catch_exception
     def rebuild_tree(self):
-        """Disconnect modules and rebuild virtual tree"""
+        """Disconnect modules and rebuild virtual tree. Nonmutative."""
         for m in self._modules:
             m.disconnect()
         self._modules = []
@@ -78,14 +78,31 @@ class Modulive(ControlSurface):
 
     # Actions
 
+    @catch_exception
     def set_active_module(self, ab, module):
         """Set active module"""
-        module.activate()
-        self._active_modules[ab] = module
-        self.broadcast_update()
+        if (
+            self._active_modules["A"] is not module
+            and self._active_modules["B"] is not module
+        ):
+            module.activate(ab)
+            self._active_modules[ab] = module
+            self.broadcast_update()
 
+    @catch_exception
     def unset_active_module(self, ab):
-        """Set active module"""
+        """Unset active module"""
+        xfade = self.song().master_track.mixer_device.crossfader
+        if (
+            ab == "A"
+            and xfade.value < xfade.max
+            or ab == "B"
+            and xfade.value > xfade.min
+        ):
+            self.show_message(
+                "Crossfader must be fully transitioned before unsetting module."
+            )
+            return
         self._active_modules[ab].deactivate()
         self._active_modules[ab] = None
         self.broadcast_update()
@@ -130,7 +147,7 @@ class Modulive(ControlSurface):
 
     @catch_exception
     def disconnect(self):
-        """Cleanup"""
+        """Cleanup. Nonmutative."""
         self._log("Disconnecting Modulive...")
         if self.song().tracks_has_listener(self.rebuild_tree):
             self.song().remove_tracks_listener(self.rebuild_tree)

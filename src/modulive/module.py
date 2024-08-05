@@ -36,7 +36,7 @@ class Module(ModuliveComponent):
 
     @catch_exception
     def _build_tree(self):
-        """Iterate through tracks and build virtual tree"""
+        """Iterate through tracks and build virtual tree. Nonmutative."""
         for idx, clip_slot in enumerate(self._config_track.clip_slots):
             row_type = get_type(self._song.scenes[idx].name)
             config_clip = None
@@ -62,7 +62,7 @@ class Module(ModuliveComponent):
 
     @catch_exception
     def _rebuild(self):
-        """Disconnect modules and rebuild virtual tree"""
+        """Disconnect modules and rebuild virtual tree. Nonmutative"""
         for comp in self._macro_variations + self._sections + self._dynamic_clips:
             comp.disconnect()
         self._macro_variations = []
@@ -92,17 +92,31 @@ class Module(ModuliveComponent):
 
     # Set
 
-    def activate(self):
+    @catch_exception
+    def activate(self, ab):
         """Prepare module for performance"""
+        self._log(self._track.mixer_device.crossfade_assign)
+        self._log(ab)
+        self._log(ab == "A")
+        if ab == "A":
+            self._log("we in A")
+            self._track.mixer_device.crossfade_assign = 0
+        elif ab == "B":
+            self._track.mixer_device.crossfade_assign = 2
         self._log(f"Activating Module [{self.get_name()}]...")
 
+    @catch_exception
     def deactivate(self):
         """Disable module"""
-        self._log(f"Dectivating Module [{self.get_name()}]...")
+        self._track.mixer_device.crossfade_assign = 1
+        self._log(f"Deactivating Module [{self.get_name()}]...")
 
     def select_section(self, idx):
         """Select Section at index"""
         if self._sections[idx]:
+            for section in self._sections:
+                if section:
+                    section.stop()
             self._sections[idx].select()
 
     def stop_section(self, idx):
@@ -141,7 +155,7 @@ class Module(ModuliveComponent):
 
     @catch_exception
     def disconnect(self):
-        """Remove all listeners and disconnect"""
+        """Remove all listeners and disconnect. Nonmutative."""
         self._remove_name_and_color_listeners()
         self._remove_clip_listeners()
         super().disconnect()
