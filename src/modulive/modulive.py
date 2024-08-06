@@ -23,7 +23,7 @@ class Modulive(ControlSurface):
         self._log("Initializing Modulive...")
 
         self._modules = []
-        self._active_modules = {"A": None, "B": None}
+        self._active_modules = {"X": None, "Y": None}
 
         self._mapping_listeners = []
 
@@ -61,22 +61,22 @@ class Modulive(ControlSurface):
                 )
             ),
             "active_module": {
-                "A": self._active_modules["A"].get_active_state()
-                if self._active_modules["A"]
+                "X": self._active_modules["X"].get_active_state()
+                if self._active_modules["X"]
                 else "None",
-                "B": self._active_modules["B"].get_active_state()
-                if self._active_modules["B"]
+                "Y": self._active_modules["Y"].get_active_state()
+                if self._active_modules["Y"]
                 else "None",
             },
         }
 
-    def get_active_params(self, ab):
-        """Return a list of active Ableton Parameters for module A or B"""
+    def get_active_params(self, xy):
+        """Return a list of active Ableton Parameters for module X or Y"""
         return [1, 2, 3]
 
-    def get_active_module(self, ab):
-        """Return active module, A/B"""
-        return self._active_modules[ab]
+    def get_active_module(self, xy):
+        """Return active module, X/Y"""
+        return self._active_modules[xy]
 
     def get_module(self, idx):
         """Return module of given index"""
@@ -87,32 +87,32 @@ class Modulive(ControlSurface):
     # Actions
 
     @catch_exception
-    def set_active_module(self, ab, module):
+    def set_active_module(self, xy, module):
         """Set active module"""
         if (
-            self._active_modules["A"] is not module
-            and self._active_modules["B"] is not module
+            self._active_modules["X"] is not module
+            and self._active_modules["Y"] is not module
         ):
-            module.activate(ab)
-            self._active_modules[ab] = module
+            module.activate(xy)
+            self._active_modules[xy] = module
             self.broadcast_update()
 
     @catch_exception
-    def unset_active_module(self, ab):
+    def unset_active_module(self, xy):
         """Unset active module"""
         xfade = self.song().master_track.mixer_device.crossfader
         if (
-            ab == "A"
+            xy == "X"
             and xfade.value < xfade.max
-            or ab == "B"
+            or xy == "Y"
             and xfade.value > xfade.min
         ):
             self.show_message(
                 "Crossfader must be fully transitioned before unsetting module."
             )
             return
-        self._active_modules[ab].deactivate()
-        self._active_modules[ab] = None
+        self._active_modules[xy].deactivate()
+        self._active_modules[xy] = None
         self.broadcast_update()
 
     @catch_exception

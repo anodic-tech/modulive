@@ -108,14 +108,11 @@ class Module(ModuliveComponent):
     # Set
 
     @catch_exception
-    def activate(self, ab):
+    def activate(self, xy):
         """Prepare module for performance"""
-        self._log(self._track.mixer_device.crossfade_assign)
-        self._log(ab)
-        self._log(ab == "A")
-        if ab == "A":
+        if xy == "X":
             self._track.mixer_device.crossfade_assign = 0
-        elif ab == "B":
+        elif xy == "Y":
             self._track.mixer_device.crossfade_assign = 2
         self._log(f"Activating Module [{self.get_name()}]...")
 

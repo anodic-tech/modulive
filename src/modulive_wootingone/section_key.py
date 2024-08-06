@@ -10,26 +10,26 @@ logger = logging.getLogger("modulive")
 @catch_exception
 def handle_section_key_press(wooting, modulive, params, value):
     """Select/Deselect section"""
-    ab = params[0]
+    xy = params[0]
     idx = int(params[1])
-    module = modulive.get_active_module(ab)
+    module = modulive.get_active_module(xy)
     if module:
         if "ctrl" in wooting.get_state()["modifiers"]:
-            modulive.unset_active_module(ab)
+            modulive.unset_active_module(xy)
         elif "shift" in wooting.get_state()["modifiers"]:
             module.stop_section(idx)
         elif value > 0:
             module.select_section(idx)
         else:
-            logger.info(f"deselect SECTION {ab}{idx}")
+            logger.info(f"deselect SECTION {xy}{idx}")
 
 
 @catch_exception
 def handle_section_key_feedback(_, modulive, params, btn, note):
     """Send note to controler to update LED"""
-    ab = params[0]
+    xy = params[0]
     idx = int(params[1])
-    module = modulive.get_active_module(ab)
+    module = modulive.get_active_module(xy)
     if module:
         section = module.get_section(idx)
         if section:
