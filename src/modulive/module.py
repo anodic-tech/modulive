@@ -90,6 +90,21 @@ class Module(ModuliveComponent):
             return None
         return self._sections[idx]
 
+    def get_state(self):
+        return {"name": self.get_name(), "color_index": self.get_color_index()}
+
+    def get_active_state(self):
+        return {
+            "name": self.get_name(),
+            "color_index": self.get_color_index(),
+            "sections": list(
+                map(
+                    lambda s: (s.get_state() if s else "None"),
+                    self._sections,
+                )
+            ),
+        }
+
     # Set
 
     @catch_exception

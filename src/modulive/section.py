@@ -14,6 +14,8 @@ class Section(ModuliveComponent):
 
         # self._log(f"Creating Section [{self.get_name()}]...")
 
+    # Get
+
     def get_name(self):
         """Get main track name"""
         return get_name(self._config_clip.name)
@@ -35,6 +37,16 @@ class Section(ModuliveComponent):
             if clip.get_is_triggered():
                 return True
         return False
+
+    def get_state(self):
+        return {
+            "name": self.get_name(),
+            "color_index": self.get_color_index(),
+            "is_playing": self.get_is_playing(),
+            "is_triggered": self.get_is_triggered(),
+        }
+
+    # Set
 
     def select(self):
         """Select all clips in section"""

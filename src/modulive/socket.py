@@ -54,6 +54,7 @@ class Socket(ModuliveComponent):
             name (string): the name of the event
             obj (dict): the data to send. Defaults to None.
         """
+        self._log(obj)
 
         def json_replace(obj):
             return str(obj)

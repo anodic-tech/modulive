@@ -56,10 +56,18 @@ class Modulive(ControlSurface):
         return {
             "modules": list(
                 map(
-                    lambda m: {"name": m.get_name(), "color": m.get_color_index()},
+                    lambda m: m.get_state(),
                     self._modules,
                 )
-            )
+            ),
+            "active_module": {
+                "A": self._active_modules["A"].get_active_state()
+                if self._active_modules["A"]
+                else "None",
+                "B": self._active_modules["B"].get_active_state()
+                if self._active_modules["B"]
+                else "None",
+            },
         }
 
     def get_active_params(self, ab):
