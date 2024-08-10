@@ -28,12 +28,8 @@ color_index_map = {
     55: 90,  # white
 }
 
-indices_x = [
-0,1,4,5,8,9,12
-]
-indices_y = [
-2,3,6,7,10,11,15
-]
+indices_x = [0, 1, 4, 5, 8, 9, 12]
+indices_y = [2, 3, 6, 7, 10, 11, 15]
 
 
 class ModuliveMFT(ModuliveSurface):
@@ -76,15 +72,19 @@ class ModuliveMFT(ModuliveSurface):
 
         if self.modulive.get_active_module("X"):
             params = self.modulive.get_active_module("X").get_params()
-            for i,n in enumerate(indices_x):
+            for i, n in enumerate(indices_x):
                 if params[i]:
-                    self._assign_encoder(n,params[i]['param'],params[i]['color_index'])
+                    self._assign_encoder(
+                        n, params[i]["param"], params[i]["color_index"]
+                    )
 
         if self.modulive.get_active_module("Y"):
             params = self.modulive.get_active_module("Y").get_params()
-            for i,n in enumerate(indices_y):
+            for i, n in enumerate(indices_y):
                 if params[i]:
-                    self._assign_encoder(n,params[i]['param'],params[i]['color_index'])
+                    self._assign_encoder(
+                        n, params[i]["param"], params[i]["color_index"]
+                    )
 
     def _assign_encoder(self, n, param, color=None):
         """Assign an encoder to a parameter"""

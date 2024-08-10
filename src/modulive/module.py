@@ -119,28 +119,35 @@ class Module(ModuliveComponent):
     @catch_exception
     def get_params(self):
         """Get a list of params for the active mapping"""
-        params = []
+        params = [None, None, None, None, None, None, None]
+
         mapping = self._get_current_mapping()
-        if mapping:
-            for device in mapping.devices:
-                if device.name == "__PARAMS__":
-                    for i, chain in enumerate(device.chains):
-                        params.append(None)
-                        if chain.name != '_':
-                            track_name = get_param_path(chain.name)[0]
-                            param_name = get_param_path(chain.name)[1]
-                            for track in self._child_tracks:
-                                if track.name == track_name:
-                                    main_device = get_main_device(track)
-                                    for param in main_device.parameters:
-                                        if param.name == param_name:
-                                            params[i] = {
-                                                "param": param,
-                                                "track": track_name,
-                                                "color_index": chain.color_index
-                                                if not chain.is_auto_colored
-                                                else track.color_index,
-                                        }
+        if not mapping:
+            return params
+
+        params_device = None
+        for device in mapping.devices:
+            if device.name == "__PARAMS__":
+                params_device = device
+
+        for i, chain in enumerate(params_device.chains):
+            if chain.name == "_":
+                continue
+            track_name = get_param_path(chain.name)[0]
+            param_name = get_param_path(chain.name)[1]
+
+            for track in self._child_tracks:
+                if track.name == track_name:
+                    main_device = get_main_device(track)
+                    for param in main_device.parameters:
+                        if param.name == param_name:
+                            params[i] = {
+                                "param": param,
+                                "track": track_name,
+                                "color_index": chain.color_index
+                                if not chain.is_auto_colored
+                                else track.color_index,
+                            }
         return params
 
     def get_state(self):
@@ -173,7 +180,7 @@ class Module(ModuliveComponent):
                         if p
                         else None
                     ),
-                    self.get_params()
+                    self.get_params(),
                 )
             ),
         }

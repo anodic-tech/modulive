@@ -30,7 +30,8 @@ def debounce(wait):
         def debounced(*args, **kwargs):
             def unblock():
                 debounced.f = False
-            if not hasattr(debounced, 'f') or not debounced.f:
+
+            if not hasattr(debounced, "f") or not debounced.f:
                 fn(*args, **kwargs)
                 debounced.f = True
                 debounced.t = Timer(wait, unblock)
