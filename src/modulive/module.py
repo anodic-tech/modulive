@@ -1,6 +1,13 @@
 """ . """
 from modulive.constants import Types
-from .utils import catch_exception, get_children, get_name, get_type
+from .utils import (
+    catch_exception,
+    get_children,
+    get_main_device,
+    get_name,
+    get_param_path,
+    get_type,
+)
 from .modulive_component import ModuliveComponent
 from .section import Section
 from .clip_wrapper import ClipWrapper
@@ -90,10 +97,59 @@ class Module(ModuliveComponent):
             return None
         return self._sections[idx]
 
+    def get_active_section(self):
+        """Get currently playing section"""
+        for section in self._sections:
+            if section and section.get_is_playing():
+                return section
+        return None
+
+    @catch_exception
+    def _get_current_mapping(self):
+        """Get the chain object correspding to the active mapping"""
+        if self.get_active_section():
+            mapping = self.get_active_section().get_mapping()
+            for device in self._config_track.devices:
+                if device.name == "__MAPPINGS__":
+                    for chain in device.chains:
+                        if chain.name is mapping:
+                            return chain
+        return None
+
+    @catch_exception
+    def get_params(self):
+        """Get a list of params for the active mapping"""
+        params = []
+        mapping = self._get_current_mapping()
+        if mapping:
+            for device in mapping.devices:
+                if device.name == "__PARAMS__":
+                    for i, chain in enumerate(device.chains):
+                        params.append(None)
+                        if chain.name != '_':
+                            track_name = get_param_path(chain.name)[0]
+                            param_name = get_param_path(chain.name)[1]
+                            for track in self._child_tracks:
+                                if track.name == track_name:
+                                    main_device = get_main_device(track)
+                                    for param in main_device.parameters:
+                                        if param.name == param_name:
+                                            params[i] = {
+                                                "param": param,
+                                                "track": track_name,
+                                                "color_index": chain.color_index
+                                                if not chain.is_auto_colored
+                                                else track.color_index,
+                                        }
+        return params
+
     def get_state(self):
+        """Get a dict representation of the state"""
         return {"name": self.get_name(), "color_index": self.get_color_index()}
 
+    @catch_exception
     def get_active_state(self):
+        """Get a more detailed state"""
         return {
             "name": self.get_name(),
             "color_index": self.get_color_index(),
@@ -101,6 +157,23 @@ class Module(ModuliveComponent):
                 map(
                     lambda s: (s.get_state() if s else "None"),
                     self._sections,
+                )
+            ),
+            "params": list(
+                map(
+                    lambda p: (
+                        {
+                            "name": p["param"].name,
+                            "value": p["param"].value,
+                            "min": p["param"].min,
+                            "max": p["param"].max,
+                            "track": p["track"],
+                            "color_index": p["color_index"],
+                        }
+                        if p
+                        else None
+                    ),
+                    self.get_params()
                 )
             ),
         }

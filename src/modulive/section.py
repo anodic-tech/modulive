@@ -1,5 +1,5 @@
 """ . """
-from .utils import catch_exception, get_name
+from .utils import catch_exception, get_arguments, get_name
 from .modulive_component import ModuliveComponent
 
 
@@ -39,12 +39,18 @@ class Section(ModuliveComponent):
         return False
 
     def get_state(self):
+        """Return a dict representation of object state"""
         return {
             "name": self.get_name(),
             "color_index": self.get_color_index(),
             "is_playing": self.get_is_playing(),
             "is_triggered": self.get_is_triggered(),
         }
+
+    @catch_exception
+    def get_mapping(self):
+        """Get the mapping name for this section"""
+        return get_arguments(self._config_clip.name)[0]
 
     # Set
 

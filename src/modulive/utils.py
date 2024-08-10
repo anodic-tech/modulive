@@ -28,15 +28,13 @@ def debounce(wait):
 
     def decorator(fn):
         def debounced(*args, **kwargs):
-            def call_it():
+            def unblock():
+                debounced.f = False
+            if not hasattr(debounced, 'f') or not debounced.f:
                 fn(*args, **kwargs)
-
-            try:
-                debounced.t.cancel()
-            except AttributeError:
-                pass
-            debounced.t = Timer(wait, call_it)
-            debounced.t.start()
+                debounced.f = True
+                debounced.t = Timer(wait, unblock)
+                debounced.t.start()
 
         return debounced
 
@@ -83,6 +81,14 @@ def get_arguments(s):
     return None
 
 
+def get_param_path(s):
+    """
+    Return a list of all period separated values
+    e.g. "instrument1.param2" returns ["instrument1","param2"]
+    """
+    return s.split(".")
+
+
 def get_children(group_track, all_tracks):
     """Take a group track and return its child tracks from a list of all tracks
 
@@ -107,3 +113,10 @@ def has_parent(track, parent):
     if track.group_track == parent:
         return True
     return has_parent(track.group_track, parent)
+
+
+def get_main_device(track):
+    """Return the maind device of a track"""
+    if len(track.devices) > 0:
+        return track.devices[0]
+    return None

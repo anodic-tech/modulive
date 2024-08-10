@@ -28,6 +28,13 @@ color_index_map = {
     55: 90,  # white
 }
 
+indices_x = [
+0,1,4,5,8,9,12
+]
+indices_y = [
+2,3,6,7,10,11,15
+]
+
 
 class ModuliveMFT(ModuliveSurface):
     """Modulive - MIDI Fighter Twister Integration"""
@@ -54,13 +61,30 @@ class ModuliveMFT(ModuliveSurface):
                 )
                 i += 1
 
-            # Assign Crossfader
-            crossfader = self.song().master_track.mixer_device.crossfader
-            self._assign_encoder(13, crossfader, 55)
-
     def _update_mapping(self):
         """Get params from Modulive"""
-        self._log(self.modulive.get_active_params("A"))
+        self._clear_encoders()
+        self._build()
+
+    @catch_exception
+    def _build(self):
+        """Assign all encoders"""
+
+        # Assign Crossfader
+        crossfader = self.song().master_track.mixer_device.crossfader
+        self._assign_encoder(13, crossfader, 55)
+
+        if self.modulive.get_active_module("X"):
+            params = self.modulive.get_active_module("X").get_params()
+            for i,n in enumerate(indices_x):
+                if params[i]:
+                    self._assign_encoder(n,params[i]['param'],params[i]['color_index'])
+
+        if self.modulive.get_active_module("Y"):
+            params = self.modulive.get_active_module("Y").get_params()
+            for i,n in enumerate(indices_y):
+                if params[i]:
+                    self._assign_encoder(n,params[i]['param'],params[i]['color_index'])
 
     def _assign_encoder(self, n, param, color=None):
         """Assign an encoder to a parameter"""
@@ -125,7 +149,7 @@ class ModuliveMFT(ModuliveSurface):
             self.listeners[index] = None
             self.params[index] = None
 
-    def _rebuild(self):
+    def _clear_encoders(self):
         i = 0
         while i < ENCODER_COUNT:
             self._clear_encoder(i)
@@ -136,5 +160,5 @@ class ModuliveMFT(ModuliveSurface):
 
     def disconnect(self):
         """."""
-        self._rebuild()
+        self._clear_encoders()
         super().disconnect()
