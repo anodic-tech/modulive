@@ -71,7 +71,8 @@ class Module(ModuliveComponent):
     def _rebuild(self):
         """Disconnect modules and rebuild virtual tree. Nonmutative"""
         for comp in self._macro_variations + self._sections + self._dynamic_clips:
-            comp.disconnect()
+            if comp:
+                comp.disconnect()
         self._macro_variations = []
         self._sections = []
         self._dynamic_clips = []
@@ -162,7 +163,7 @@ class Module(ModuliveComponent):
             "color_index": self.get_color_index(),
             "sections": list(
                 map(
-                    lambda s: (s.get_state() if s else "None"),
+                    lambda s: (s.get_state() if s else None),
                     self._sections,
                 )
             ),

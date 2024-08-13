@@ -23,6 +23,7 @@ class Socket(ModuliveComponent):
 
         def parse():
             self.process()
+            self.send("message", self.canonical_parent.get_state())
             self.canonical_parent.schedule_message(1, parse)
 
         parse()
@@ -54,7 +55,7 @@ class Socket(ModuliveComponent):
             name (string): the name of the event
             obj (dict): the data to send. Defaults to None.
         """
-        self._log(obj)
+        # self._log(obj)
 
         def json_replace(obj):
             return str(obj)

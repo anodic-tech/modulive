@@ -39,7 +39,7 @@ class Modulive(ControlSurface):
         for track in self.song().tracks:
             if get_type(track.name) is Types.MODULE:
                 self._modules.append(Module(track))
-        self.broadcast_update()
+        self.schedule_message(1, self.broadcast_update)
 
     @catch_exception
     def rebuild_tree(self):
@@ -63,11 +63,12 @@ class Modulive(ControlSurface):
             "active_module": {
                 "X": self._active_modules["X"].get_active_state()
                 if self._active_modules["X"]
-                else "None",
+                else None,
                 "Y": self._active_modules["Y"].get_active_state()
                 if self._active_modules["Y"]
-                else "None",
+                else None,
             },
+            "xfade": self.song().master_track.mixer_device.crossfader.value,
         }
 
     def get_active_params(self, xy):

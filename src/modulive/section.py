@@ -67,4 +67,6 @@ class Section(ModuliveComponent):
     @catch_exception
     def disconnect(self):
         """Remove all listeners and disconnect"""
+        for clip in self._clips:
+            clip.disconnect()
         super().disconnect()
