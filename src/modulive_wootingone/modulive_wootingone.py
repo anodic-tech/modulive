@@ -3,6 +3,10 @@ from functools import partial
 from modulive.modulive_surface import ModuliveSurface
 from modulive.utils import catch_exception, get_arguments, get_type
 from modulive_wootingone.constants import KEYS
+from modulive_wootingone.dynamic_clip_key import (
+    handle_dynamic_key_feedback,
+    handle_dynamic_key_press,
+)
 from modulive_wootingone.global_key import (
     handle_global_key_feedback,
     handle_global_key_press,
@@ -35,6 +39,10 @@ KEY_TYPES = {
     "SECTION_KEY": {
         "input": handle_section_key_press,
         "output": handle_section_key_feedback,
+    },
+    "DYNAMIC_KEY": {
+        "input": handle_dynamic_key_press,
+        "output": handle_dynamic_key_feedback,
     },
     "MODULE_KEY": {
         "input": handle_module_key_press,

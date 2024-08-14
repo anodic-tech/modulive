@@ -63,6 +63,17 @@ class Module(ModuliveComponent):
                     self._sections.append(Section(config_clip, clips))
                 else:
                     self._sections.append(None)
+            elif row_type == Types.DYNAMIC_CLIP:
+                if config_clip:
+                    clips = []
+                    for child_track in self._child_tracks:
+                        if child_track.clip_slots[idx].has_clip:
+                            clips.append(
+                                ClipWrapper(
+                                    child_track.clip_slots[idx].clip, child_track
+                                )
+                            )
+                    self._dynamic_clips.append(Section(config_clip, clips))
 
         self._add_name_and_color_listeners()
         self._add_clip_listeners()
@@ -118,6 +129,29 @@ class Module(ModuliveComponent):
         return None
 
     @catch_exception
+    def get_dynamic_clips(self):
+        """Get a list of dynamic clips for the active mapping"""
+        dync = [None, None, None, None, None, None, None, None]
+
+        mapping = self._get_current_mapping()
+        if not mapping:
+            return dync
+
+        clips_device = None
+        for device in mapping.devices:
+            if device.name == "__DYNAMIC-CLIPS__":
+                clips_device = device
+
+        for i, chain in enumerate(clips_device.chains):
+            if chain.name == "_":
+                continue
+
+            for dynamic_clip in self._dynamic_clips:
+                if dynamic_clip.get_name() == chain.name:
+                    dync[i] = dynamic_clip
+        return dync
+
+    @catch_exception
     def get_params(self):
         """Get a list of params for the active mapping"""
         params = [None, None, None, None, None, None, None]
@@ -165,6 +199,12 @@ class Module(ModuliveComponent):
                 map(
                     lambda s: (s.get_state() if s else None),
                     self._sections,
+                )
+            ),
+            "dynamic_clips": list(
+                map(
+                    lambda dc: (dc.get_state() if dc else None),
+                    self.get_dynamic_clips(),
                 )
             ),
             "params": list(

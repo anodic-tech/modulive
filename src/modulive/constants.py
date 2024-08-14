@@ -7,4 +7,4 @@ class Types:  # pylint: disable=too-few-public-methods
     MODULE = "M"
     MACRO_VARIATION = "MV"
     SECTION = "SECTION"
-    DYNAMIC_CLIPS = "DYNAMIC"
+    DYNAMIC_CLIP = "DYNAMIC"

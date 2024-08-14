@@ -190,6 +190,7 @@ good-names=i,
            j,
            k,
            ex,
+           dc,
            Run,
            _
 
@@ -351,7 +352,7 @@ single-line-class-stmt=no
 # else.
 single-line-if-stmt=no
 
-good-names=e,f,s,ab,m,i,n,fn,xy
+good-names=e,f,s,ab,m,i,n,fn,xy,dc
 
 [IMPORTS]
 
