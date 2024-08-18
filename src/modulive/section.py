@@ -17,3 +17,10 @@ class Section(Scene):
     def get_mapping(self):
         """Get the mapping name for this section"""
         return get_arguments(self._config_clip.name)[0]
+
+    def get_clip_for_track(self, track):
+        """Get clip for given track"""
+        for clip in self._clips:
+            if clip.get_track() == track:
+                return clip
+        return False

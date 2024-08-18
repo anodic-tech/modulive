@@ -1,5 +1,6 @@
 """ . """
 from modulive.constants import Types
+from modulive.dynamic_clip import DynamicClip
 from .utils import (
     catch_exception,
     get_children,
@@ -57,7 +58,7 @@ class Module(ModuliveComponent):
                         if child_track.clip_slots[idx].has_clip:
                             clips.append(
                                 ClipWrapper(
-                                    child_track.clip_slots[idx].clip, child_track
+                                    child_track.clip_slots[idx].clip, child_track, self
                                 )
                             )
                     self._sections.append(Section(config_clip, clips))
@@ -70,10 +71,10 @@ class Module(ModuliveComponent):
                         if child_track.clip_slots[idx].has_clip:
                             clips.append(
                                 ClipWrapper(
-                                    child_track.clip_slots[idx].clip, child_track
+                                    child_track.clip_slots[idx].clip, child_track, self
                                 )
                             )
-                    self._dynamic_clips.append(Section(config_clip, clips))
+                    self._dynamic_clips.append(DynamicClip(config_clip, clips))
 
         self._add_name_and_color_listeners()
         self._add_clip_listeners()
@@ -110,9 +111,15 @@ class Module(ModuliveComponent):
         return self._sections[idx]
 
     def get_active_section(self):
-        """Get currently playing section"""
+        """
+        Get currently playing section
+        If no playing section get triggered section
+        """
         for section in self._sections:
             if section and section.get_is_playing():
+                return section
+        for section in self._sections:
+            if section and section.get_is_triggered():
                 return section
         return None
 

@@ -24,6 +24,10 @@ def handle_dynamic_key_press(wooting, modulive, params, value):
             clip = module.get_dynamic_clips()[idx]
             if clip:
                 clip.select()
+        else:
+            clip = module.get_dynamic_clips()[idx]
+            if clip:
+                clip.deselect()
 
 
 @catch_exception

@@ -52,6 +52,11 @@ class Scene(ModuliveComponent):
         for clip in self._clips:
             clip.select()
 
+    def deselect(self):
+        """deSelect all clips in dynamic clip"""
+        for clip in self._clips:
+            clip.deselect()
+
     def stop(self):
         """Stop all clips in dynamic clip"""
         for clip in self._clips:

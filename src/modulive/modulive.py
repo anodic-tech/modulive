@@ -1,7 +1,10 @@
 """ . """
 import os
 import logging
+from collections import deque
 from _Framework.ControlSurface import ControlSurface  # type: ignore
+from _Framework.ButtonElement import ButtonElement
+from _Framework.InputControlElement import MIDI_NOTE_TYPE, MIDI_NOTE_ON_STATUS
 from .utils import catch_exception, debounce, get_type
 from .constants import Types
 from .socket import Socket
@@ -14,6 +17,7 @@ class Modulive(ControlSurface):
     """The entry point to the control surface script. Defines available actions."""
 
     IS_MODULIVE = True
+    MIDI_QUEUE_SIZE = 64
 
     @catch_exception
     def __init__(self, *a, **k):
@@ -29,6 +33,7 @@ class Modulive(ControlSurface):
 
         with self.component_guard():
             self._socket = Socket()
+            self._create_midi_buttons()
             self._build_tree()
             self.song().add_tracks_listener(self.rebuild_tree)
 
@@ -120,6 +125,37 @@ class Modulive(ControlSurface):
     def stop_all(self):
         """Stop all playing clips"""
         self.song().stop_all_clips()
+
+    @catch_exception
+    def _create_midi_buttons(self):
+        """Instantiate array of buttons to receive internal midi calls"""
+        self._midi_actions = deque()
+        self._midi_buttons = [None] * self.MIDI_QUEUE_SIZE
+        self._current_midi_button = 0
+        i = 0
+        while i < self.MIDI_QUEUE_SIZE:
+            self._midi_buttons[i] = ButtonElement(
+                True, MIDI_NOTE_TYPE, 15, i, name="global_button"
+            )
+            self._midi_buttons[i].add_value_listener(self._on_midi_button_trigger)
+            i += 1
+
+    def trigger_midi_action(self, action, priority):
+        """Add a function call to a queue of midi actions
+        to be called upon receiving internal midi"""
+        if priority:
+            self._midi_actions.append(action)
+        else:
+            self._midi_actions.appendleft(action)
+        self._send_midi((MIDI_NOTE_ON_STATUS + 15, self._current_midi_button, 127))
+        self._current_midi_button += 1
+        if self._current_midi_button >= self.MIDI_QUEUE_SIZE:
+            self._current_midi_button = 0
+
+    def _on_midi_button_trigger(self, _):
+        """Trigger intenal midi action"""
+        action = self._midi_actions.pop()
+        action()
 
     # Updates
     @debounce(0.01)

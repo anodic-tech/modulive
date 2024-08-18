@@ -64,11 +64,15 @@ def get_name(s):
     return None
 
 
-def get_commands():
+def get_commands(s):
     """
     Return a list of all comma separated values between brackets in given string
     e.g. "{Command1(),Command2()}" returns ["Command1()","Command2()"]
     """
+    match = re.search(r"\{(.*?)\}", s)
+    if match:
+        return match.group(1).split(",")
+    return []
 
 
 def get_arguments(s):
