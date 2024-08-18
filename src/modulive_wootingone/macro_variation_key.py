@@ -6,41 +6,31 @@ from modulive_wootingone.constants import Animations
 
 logger = logging.getLogger("modulive")
 
-
 @catch_exception
-def handle_section_key_press(wooting, modulive, params, value):
+def handle_variation_key_press(_, modulive, params, value):
     """Select/Deselect section"""
     xy = params[0]
     idx = int(params[1])
     module = modulive.get_active_module(xy)
     if module:
-        if "ctrl" in wooting.get_state()["modifiers"]:
-            modulive.unset_active_module(xy)
-        elif "shift" in wooting.get_state()["modifiers"]:
-            module.stop_section(idx)
-        elif value > 0:
-            module.select_section(idx)
-        else:
-            pass
-            # logger.info(f"deselect SECTION {xy}{idx}")
+        if value > 0:
+            module.select_macro_variation(idx)
 
 
 @catch_exception
-def handle_section_key_feedback(_, modulive, params, btn, note):
+def handle_variation_key_feedback(_, modulive, params, btn, note):
     """Send note to controler to update LED"""
     xy = params[0]
     idx = int(params[1])
     module = modulive.get_active_module(xy)
     if module:
-        section = module.get_section(idx)
-        if section:
+        mv = module.get_macro_variation(idx)
+        if mv:
             animation = Animations.DIM
-            if section.get_is_playing():
+            if mv.get_is_active():
                 animation = Animations.MEDIUM
-            if section.get_is_triggered():
-                animation = Animations.FLASHING
             btn.send_midi(
-                (MIDI_NOTE_ON_STATUS + animation, note, section.get_color_index())
+                (MIDI_NOTE_ON_STATUS + animation, note, mv.get_color_index())
             )
         else:
             btn.send_midi((MIDI_NOTE_ON_STATUS + Animations.DIM, note, 127))

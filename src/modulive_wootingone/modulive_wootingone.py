@@ -11,6 +11,7 @@ from modulive_wootingone.global_key import (
     handle_global_key_feedback,
     handle_global_key_press,
 )
+from modulive_wootingone.macro_variation_key import handle_variation_key_feedback, handle_variation_key_press
 from modulive_wootingone.wooting_key import WootingKey
 
 from modulive_wootingone.modifier_key import (
@@ -43,6 +44,10 @@ KEY_TYPES = {
     "DYNAMIC_KEY": {
         "input": handle_dynamic_key_press,
         "output": handle_dynamic_key_feedback,
+    },
+    "VARIATION_KEY": {
+        "input": handle_variation_key_press,
+        "output": handle_variation_key_feedback,
     },
     "MODULE_KEY": {
         "input": handle_module_key_press,

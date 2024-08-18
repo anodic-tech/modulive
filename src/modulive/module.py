@@ -1,6 +1,7 @@
 """ . """
 from modulive.constants import Types
 from modulive.dynamic_clip import DynamicClip
+from modulive.macro_variation import MacroVariation
 from .utils import (
     catch_exception,
     get_children,
@@ -75,6 +76,15 @@ class Module(ModuliveComponent):
                                 )
                             )
                     self._dynamic_clips.append(DynamicClip(config_clip, clips))
+            elif row_type == Types.MACRO_VARIATION:
+                if config_clip:
+                    clips = []
+                    for child_track in self._child_tracks:
+                        if child_track.clip_slots[idx].has_clip:
+                            clips.append(child_track.clip_slots[idx].clip)
+                    self._macro_variations.append(MacroVariation(config_clip, clips))
+                else:
+                    self._macro_variations.append(None)
 
         self._add_name_and_color_listeners()
         self._add_clip_listeners()
@@ -109,11 +119,17 @@ class Module(ModuliveComponent):
         if len(self._sections) <= idx:
             return None
         return self._sections[idx]
+    
+    def get_macro_variation(self, idx):
+        """Get macro_variation with index"""
+        if len(self._macro_variations) <= idx:
+            return None
+        return self._macro_variations[idx]
 
     def get_active_section(self):
         """
-        Get currently playing section
-        If no playing section get triggered section
+            Get currently playing section
+            If no playing section get triggered section    
         """
         for section in self._sections:
             if section and section.get_is_playing():
@@ -128,6 +144,7 @@ class Module(ModuliveComponent):
         """Get the chain object correspding to the active mapping"""
         if self.get_active_section():
             mapping = self.get_active_section().get_mapping()
+            if mapping is None: return None
             for device in self._config_track.devices:
                 if device.name == "__MAPPINGS__":
                     for chain in device.chains:
@@ -214,6 +231,12 @@ class Module(ModuliveComponent):
                     self.get_dynamic_clips(),
                 )
             ),
+            "macro_variations": list(
+                map(
+                    lambda mv: (mv.get_state() if mv else None),
+                    self._macro_variations,
+                )
+            ),
             "params": list(
                 map(
                     lambda p: (
@@ -261,6 +284,11 @@ class Module(ModuliveComponent):
                 if section:
                     section.stop()
             self._sections[idx].select()
+
+    def select_macro_variation(self, idx):
+        """Select Macro Variation at index"""
+        if self._macro_variations[idx]:
+            self._macro_variations[idx].select()
 
     def stop_section(self, idx):
         """Select Section at index"""

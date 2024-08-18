@@ -16,7 +16,9 @@ class Section(Scene):
     @catch_exception
     def get_mapping(self):
         """Get the mapping name for this section"""
-        return get_arguments(self._config_clip.name)[0]
+        if len(self._config_clip.name) > 0:
+            return get_arguments(self._config_clip.name)[0]
+        return None
 
     def get_clip_for_track(self, track):
         """Get clip for given track"""
