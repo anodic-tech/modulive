@@ -10,6 +10,7 @@ class MacroVariation(ModuliveComponent):
         super().__init__()
         self._config_clip = config_clip
         self._clips = clips
+        self._active = False
 
     def get_name(self):
         """Get variation name"""
@@ -20,7 +21,7 @@ class MacroVariation(ModuliveComponent):
         return self._config_clip.color_index
     
     def get_is_active(self):
-        return False
+        return self._active
     
     def get_value(self):
         return 0
@@ -35,4 +36,9 @@ class MacroVariation(ModuliveComponent):
         }
     
     def select(self):
-        pass
+        self._active = True
+        self._broadcast_update()
+
+    def deselect(self):
+        self._active = False
+        self._broadcast_update()

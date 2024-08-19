@@ -295,6 +295,11 @@ class Module(ModuliveComponent):
         if self._sections[idx]:
             self._sections[idx].stop()
 
+    def deselect_macro_variation(self, idx):
+        """deSelect Macro Variation at index"""
+        if self._macro_variations[idx]:
+            self._macro_variations[idx].deselect()
+
     def _add_name_and_color_listeners(self):
         """Broadcast state change on color or name update to a track"""
         for track in [self._track] + self._child_tracks:

@@ -32,6 +32,7 @@ from modulive_wootingone.section_key import (
     handle_section_key_press,
 )
 
+#TODO: refactor to use extendable classes instead of floating objects
 KEY_TYPES = {
     "GLOBAL_KEY": {
         "input": handle_global_key_press,

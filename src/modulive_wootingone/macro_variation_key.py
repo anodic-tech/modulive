@@ -15,6 +15,8 @@ def handle_variation_key_press(_, modulive, params, value):
     if module:
         if value > 0:
             module.select_macro_variation(idx)
+        else:
+            module.deselect_macro_variation(idx)
 
 
 @catch_exception
