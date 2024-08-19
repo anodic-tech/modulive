@@ -11,7 +11,10 @@ from modulive_wootingone.global_key import (
     handle_global_key_feedback,
     handle_global_key_press,
 )
-from modulive_wootingone.macro_variation_key import handle_variation_key_feedback, handle_variation_key_press
+from modulive_wootingone.macro_variation_key import (
+    handle_variation_key_feedback,
+    handle_variation_key_press,
+)
 from modulive_wootingone.wooting_key import WootingKey
 
 from modulive_wootingone.modifier_key import (
@@ -32,7 +35,7 @@ from modulive_wootingone.section_key import (
     handle_section_key_press,
 )
 
-#TODO: refactor to use extendable classes instead of floating objects
+# TODO: refactor to use extendable classes instead of floating objects
 KEY_TYPES = {
     "GLOBAL_KEY": {
         "input": handle_global_key_press,

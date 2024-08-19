@@ -5,7 +5,7 @@ from functools import partial
 import Live  # type: ignore
 from _Framework.EncoderElement import EncoderElement  # type: ignore
 from modulive.modulive_surface import ModuliveSurface
-from modulive.utils import catch_exception
+from modulive.utils import catch_exception, get_main_device
 
 MIDI_CC_TYPE = 1
 MIDI_ROTARY_CHANNEL = 0
@@ -69,6 +69,10 @@ class ModuliveMFT(ModuliveSurface):
         # Assign Crossfader
         crossfader = self.song().master_track.mixer_device.crossfader
         self._assign_encoder(13, crossfader, 55)
+
+        # Assign Variation Knob
+        variation_knob = get_main_device(self.song().master_track).parameters[1]
+        self._assign_encoder(14, variation_knob, 55)
 
         if self.modulive.get_active_module("X"):
             params = self.modulive.get_active_module("X").get_params()

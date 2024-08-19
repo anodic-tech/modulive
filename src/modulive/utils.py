@@ -125,3 +125,40 @@ def get_main_device(track):
     if len(track.devices) > 0:
         return track.devices[0]
     return None
+
+
+def get_beats_remaining(song, quantize):
+    """Get beats remaining before provided quantize value triggers"""
+    beats_remaining = 0
+    # if Global, use that quantize
+    if quantize == 0:
+        quantize = song.clip_trigger_quantization
+    else:
+        quantize -= 1
+    if quantize == 0 or quantize >= 5:
+        beats_remaining = 0
+    else:
+        beat_divisors = {
+            1: 8 * song.signature_numerator,
+            2: 4 * song.signature_numerator,
+            3: 2 * song.signature_numerator,
+            4: 1 * song.signature_numerator,
+        }
+        beat_divisor = beat_divisors[quantize]
+        total_beats = song.get_current_beats_song_time().beats + (
+            (song.get_current_beats_song_time().bars - 1) * song.signature_numerator
+        )
+        if total_beats % beat_divisor == 0:
+            beats_remaining = 0
+        else:
+            beats_remaining = beat_divisor - (total_beats % beat_divisor)
+    return beats_remaining
+
+
+def update_parameter_value(param, value):
+    """safe update of parameter"""
+    if value > param.max:
+        value = param.max
+    elif value < param.min:
+        value = param.min
+    param.value = value

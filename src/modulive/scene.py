@@ -45,6 +45,9 @@ class Scene(ModuliveComponent):
             "is_triggered": self.get_is_triggered(),
         }
 
+    def get_quantization(self):
+        return self._config_clip.launch_quantization
+
     # Set
 
     def select(self):

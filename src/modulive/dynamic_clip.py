@@ -3,7 +3,7 @@ from modulive.scene import Scene
 from .utils import catch_exception
 
 
-#TODO: Come up with a better name
+# TODO: Come up with a better name
 class DynamicClip(Scene):
     """Dynamic Clip component"""
 

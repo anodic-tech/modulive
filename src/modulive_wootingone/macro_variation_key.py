@@ -6,6 +6,7 @@ from modulive_wootingone.constants import Animations
 
 logger = logging.getLogger("modulive")
 
+
 @catch_exception
 def handle_variation_key_press(_, modulive, params, value):
     """Select/Deselect section"""
@@ -31,8 +32,6 @@ def handle_variation_key_feedback(_, modulive, params, btn, note):
             animation = Animations.DIM
             if mv.get_is_active():
                 animation = Animations.MEDIUM
-            btn.send_midi(
-                (MIDI_NOTE_ON_STATUS + animation, note, mv.get_color_index())
-            )
+            btn.send_midi((MIDI_NOTE_ON_STATUS + animation, note, mv.get_color_index()))
         else:
             btn.send_midi((MIDI_NOTE_ON_STATUS + Animations.DIM, note, 127))

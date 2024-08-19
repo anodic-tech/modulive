@@ -3,9 +3,11 @@ import os
 import logging
 from collections import deque
 from _Framework.ControlSurface import ControlSurface  # type: ignore
-from _Framework.ButtonElement import ButtonElement
+from _Framework.ButtonElement import ButtonElement  # type: ignore
 from _Framework.InputControlElement import MIDI_NOTE_TYPE, MIDI_NOTE_ON_STATUS
-from .utils import catch_exception, debounce, get_type
+from modulive.param_ramper import ParamRamper
+from modulive.variation_knob import VariationKnob  # type: ignore
+from .utils import catch_exception, debounce, get_main_device, get_type
 from .constants import Types
 from .socket import Socket
 from .module import Module
@@ -34,6 +36,8 @@ class Modulive(ControlSurface):
         with self.component_guard():
             self._socket = Socket()
             self._create_midi_buttons()
+            self._param_ramper = ParamRamper()
+            self._variation_knob = VariationKnob()
             self._build_tree()
             self.song().add_tracks_listener(self.rebuild_tree)
 
@@ -74,6 +78,9 @@ class Modulive(ControlSurface):
                 else None,
             },
             "xfade": self.song().master_track.mixer_device.crossfader.value,
+            "variation_knob": get_main_device(self.song().master_track)
+            .parameters[1]
+            .value,
         }
 
     def get_active_params(self, xy):
@@ -156,6 +163,18 @@ class Modulive(ControlSurface):
         """Trigger intenal midi action"""
         action = self._midi_actions.pop()
         action()
+
+    @catch_exception
+    def ramp_param(self, param, value, quantization):
+        self._param_ramper.ramp_param(param, value, quantization)
+
+    @catch_exception
+    def assign_variation_knob(self, macro_variation):
+        self._variation_knob.assign_variation(macro_variation)
+
+    @catch_exception
+    def clear_variation_knob(self, macro_variation):
+        self._variation_knob.clear_assignment(macro_variation)
 
     # Updates
     @debounce(0.01)
