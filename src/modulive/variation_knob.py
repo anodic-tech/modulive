@@ -23,6 +23,9 @@ class VariationKnob(ModuliveComponent):
         self._assigned_variation = None
         self._reset_knob_flag = False
 
+    def get_knob(self):
+        return self._knob
+
     def _lock(self):
         """prevent updates"""
         self._is_locked = True

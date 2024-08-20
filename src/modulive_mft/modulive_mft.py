@@ -70,9 +70,9 @@ class ModuliveMFT(ModuliveSurface):
         crossfader = self.song().master_track.mixer_device.crossfader
         self._assign_encoder(13, crossfader, 55)
 
-        # Assign Variation Knob
-        variation_knob = get_main_device(self.song().master_track).parameters[1]
-        self._assign_encoder(14, variation_knob, 55)
+        # Assign Dynamic Param
+        dynamic_param = self.modulive.get_dynamic_param()
+        self._assign_encoder(14, dynamic_param[0], color=dynamic_param[1])
 
         if self.modulive.get_active_module("X"):
             params = self.modulive.get_active_module("X").get_params()
@@ -90,19 +90,26 @@ class ModuliveMFT(ModuliveSurface):
                         n, params[i]["param"], params[i]["color_index"]
                     )
 
-    def _assign_encoder(self, n, param, color=None):
+    def _assign_encoder(self, n, param, color=None, min=None, max=None):
         """Assign an encoder to a parameter"""
         # if previously assigned remove mapping
+
+        if min is None:
+            min = param.min
+
+        if max is None:
+            max = param.max
+
         if self.listeners[n]:
             self.listeners[n]()
 
         # add listener to param
-        update_encoder = partial(self._update_encoder, n, param)
+        update_encoder = partial(self._update_encoder, n, param, min, max)
         param.add_value_listener(update_encoder)
 
         # add listener to encoder
         self.params[n] = param
-        update_param = partial(self._update_param, n)
+        update_param = partial(self._update_param, n, min, max)
         self.encoders[n].add_value_listener(update_param)
 
         # add a way to remove mapping
@@ -121,15 +128,17 @@ class ModuliveMFT(ModuliveSurface):
 
         update_encoder()
 
-    def _update_encoder(self, index, param):
+    @catch_exception
+    def _update_encoder(self, index, param, min, max):
         """Update an encoder with parameter value"""
-        value = math.floor((param.value - param.min) / (param.max - param.min) * 127)
-        self._send_midi((176, index, value))
+        value = math.floor((param.value-min)/(max-min)*127)
+        self._send_midi((176,index,value))
 
-    def _update_param(self, index, encoder_value):
+    @catch_exception
+    def _update_param(self, index, min, max, encoder_value):
         """Update a param with encoder value"""
         param = self.params[index]
-        value = (encoder_value / 127) * (param.max - param.min) + param.min
+        value = (encoder_value/127)*(max-min)+min
         param.value = value
 
     def _on_midi_button_trigger(self, i, _):
