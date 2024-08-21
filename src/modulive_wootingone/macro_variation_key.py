@@ -35,3 +35,5 @@ def handle_variation_key_feedback(_, modulive, params, btn, note):
             btn.send_midi((MIDI_NOTE_ON_STATUS + animation, note, mv.get_color_index()))
         else:
             btn.send_midi((MIDI_NOTE_ON_STATUS + Animations.DIM, note, 127))
+    else:
+        btn.send_midi((MIDI_NOTE_ON_STATUS + Animations.DIM, note, 0))

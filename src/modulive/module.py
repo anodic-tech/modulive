@@ -3,7 +3,9 @@ from modulive.constants import Types
 from modulive.dynamic_clip import DynamicClip
 from modulive.macro_variation import MacroVariation
 from .utils import (
+    activate_track,
     catch_exception,
+    deactivate_track,
     get_children,
     get_main_device,
     get_name,
@@ -278,12 +280,19 @@ class Module(ModuliveComponent):
         elif xy == "Y":
             self._track.mixer_device.crossfade_assign = 2
         self._log(f"Activating Module [{self.get_name()}]...")
+        for track in [self._track] + self._child_tracks:
+            activate_track(track)
+        #Set initial params
+        if len(self._macro_variations) > 0:
+            self._macro_variations[0].ramp(0)
 
     @catch_exception
     def deactivate(self):
         """Disable module"""
         self._track.mixer_device.crossfade_assign = 1
         self._log(f"Deactivating Module [{self.get_name()}]...")
+        for track in [self._track] + self._child_tracks:
+            deactivate_track(track)
 
     def stop(self):
         """Stop all clips in module"""

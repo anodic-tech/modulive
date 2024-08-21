@@ -28,7 +28,8 @@ class ModuliveComponent(
 
     def _midi_action(self, action, priority=False):
         """Call a deffered action"""
-        self.canonical_parent.trigger_midi_action(action, priority)
+        if self.canonical_parent:
+            self.canonical_parent.trigger_midi_action(action, priority)
 
     def _add_listener(self, add, exists, remove, callback):
         """Add a listener function that will be removed on disconnect"""

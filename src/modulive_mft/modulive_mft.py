@@ -131,14 +131,14 @@ class ModuliveMFT(ModuliveSurface):
     @catch_exception
     def _update_encoder(self, index, param, min, max):
         """Update an encoder with parameter value"""
-        value = math.floor((param.value-min)/(max-min)*127)
-        self._send_midi((176,index,value))
+        value = math.floor((param.value - min) / (max - min) * 127)
+        self._send_midi((176, index, value))
 
     @catch_exception
     def _update_param(self, index, min, max, encoder_value):
         """Update a param with encoder value"""
         param = self.params[index]
-        value = (encoder_value/127)*(max-min)+min
+        value = (encoder_value / 127) * (max - min) + min
         param.value = value
 
     def _on_midi_button_trigger(self, i, _):

@@ -1,6 +1,7 @@
 """ . """
 
 KEYS = [
+    {"name": "escape", "note": 41, "functions": ["<MODIFIER_KEY>(esc)"]},
     {"name": "~", "note": 53, "functions": ["<GLOBAL_KEY>()"]},
     {"name": "print", "note": 70, "functions": ["<MODULE_INDICATOR_KEY>(X)"]},
     {"name": "f1", "note": 58, "functions": ["<VARIATION_KEY>(X,0)"]},

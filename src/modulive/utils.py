@@ -162,3 +162,15 @@ def update_parameter_value(param, value):
     elif value < param.min:
         value = param.min
     param.value = value
+
+def activate_track(track):
+    """Turn on main device for given track"""
+    device = get_main_device(track)
+    if device:
+        device.parameters[0].value = 1
+
+def deactivate_track(track):
+    """Turn of main device for given track"""
+    device = get_main_device(track)
+    if device:
+        device.parameters[0].value = 0

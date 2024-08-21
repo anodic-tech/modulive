@@ -13,6 +13,8 @@ def handle_global_key_press(wooting, modulive, _, value):
     if value:
         if "shift" in wooting.get_state()["modifiers"]:
             modulive.stop_all()
+        elif "esc" in wooting.get_state()["modifiers"]:
+            modulive.reset_all()
         else:
             modulive.toggle_tempo_modification(True)
     else:
