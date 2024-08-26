@@ -154,7 +154,7 @@ def get_beats_remaining(song, quantize):
             beats_remaining = beat_divisor - (total_beats % beat_divisor)
     return beats_remaining
 
-
+@catch_exception
 def update_parameter_value(param, value):
     """safe update of parameter"""
     if value > param.max:

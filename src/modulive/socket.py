@@ -23,8 +23,8 @@ class Socket(ModuliveComponent):
 
         def parse():
             self.process()
-            self.send("message", self.canonical_parent.get_state())
-            self.canonical_parent.schedule_message(1, parse)
+            self.send("message", self.modulive.get_state())
+            self.modulive.schedule_message(1, parse)
 
         parse()
 
@@ -99,7 +99,7 @@ class Socket(ModuliveComponent):
         """If received payload requests state, get state from Modulive and return"""
         if payload["event"] == "get_state":
             try:
-                state = self.canonical_parent.get_state()
+                state = self.modulive.get_state()
                 self.send("give_state", state)
             except Exception as e:
                 self._error("Error: " + str(e.args))

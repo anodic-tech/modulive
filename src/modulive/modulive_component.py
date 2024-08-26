@@ -13,6 +13,10 @@ class ModuliveComponent(
     def __init__(self):
         super().__init__()
         self._listener_removers = []
+        self.modulive = None
+        for control_surface in self.canonical_parent._control_surfaces():
+            if hasattr(control_surface, "IS_MODULIVE"):
+                self.modulive = control_surface
 
     def _log(self, message):
         """Call log"""
@@ -24,12 +28,11 @@ class ModuliveComponent(
 
     def _broadcast_update(self):
         """Notify listeners of state update"""
-        self.canonical_parent.broadcast_update()
+        self.modulive.broadcast_update()
 
     def _midi_action(self, action, priority=False):
         """Call a deffered action"""
-        if self.canonical_parent:
-            self.canonical_parent.trigger_midi_action(action, priority)
+        self.modulive.trigger_midi_action(action, priority)
 
     def _add_listener(self, add, exists, remove, callback):
         """Add a listener function that will be removed on disconnect"""

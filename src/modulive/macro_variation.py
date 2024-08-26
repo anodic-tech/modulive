@@ -55,16 +55,16 @@ class MacroVariation(ModuliveComponent):
 
     def select(self):
         self._active = True
-        self.canonical_parent.assign_variation_knob(self)
+        self.modulive.assign_variation_knob(self)
         self._broadcast_update()
 
     def deselect(self):
         self._active = False
-        self.canonical_parent.clear_variation_knob(self)
+        self.modulive.clear_variation_knob(self)
         self._broadcast_update()
 
     def ramp(self, quantization):
         for param_value in self.get_param_values():
-            self.canonical_parent.ramp_param(
+            self.modulive.ramp_param(
                 param_value["param"], param_value["target_value"], quantization
             )

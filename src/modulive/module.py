@@ -48,6 +48,11 @@ class Module(ModuliveComponent):
     @catch_exception
     def _build_tree(self):
         """Iterate through tracks and build virtual tree. Nonmutative."""
+
+        self._macro_variations = []
+        self._sections = []
+        self._dynamic_clips = []
+        
         for idx, clip_slot in enumerate(self._config_track.clip_slots):
             row_type = get_type(self._song.scenes[idx].name)
             config_clip = None
@@ -291,6 +296,7 @@ class Module(ModuliveComponent):
         """Disable module"""
         self._track.mixer_device.crossfade_assign = 1
         self._log(f"Deactivating Module [{self.get_name()}]...")
+        self.stop()
         for track in [self._track] + self._child_tracks:
             deactivate_track(track)
 
