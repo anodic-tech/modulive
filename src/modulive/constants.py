@@ -6,5 +6,5 @@ class Types:  # pylint: disable=too-few-public-methods
 
     MODULE = "M"
     MACRO_VARIATION = "MV"
-    SECTION = "SECTION"
-    DYNAMIC_CLIP = "DYNAMIC"
+    SECTION = "S"
+    DYNAMIC_CLIP = "DC"

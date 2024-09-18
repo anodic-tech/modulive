@@ -17,6 +17,7 @@ class MacroVariation(ModuliveComponent):
         self._track_clips = track_clips
         self._active = False
         self._value = 0
+        self._log(f'Creating Macro Variation {self.get_name()}...')
 
     def get_name(self):
         """Get variation name"""
@@ -55,7 +56,8 @@ class MacroVariation(ModuliveComponent):
 
     def select(self):
         self._active = True
-        self.modulive.assign_variation_knob(self)
+        # self.modulive.assign_variation_knob(self)
+        self.ramp()
         self._broadcast_update()
 
     def deselect(self):
@@ -63,7 +65,7 @@ class MacroVariation(ModuliveComponent):
         self.modulive.clear_variation_knob(self)
         self._broadcast_update()
 
-    def ramp(self, quantization):
+    def ramp(self, quantization=0):
         for param_value in self.get_param_values():
             self.modulive.ramp_param(
                 param_value["param"], param_value["target_value"], quantization

@@ -52,7 +52,7 @@ class Module(ModuliveComponent):
         self._macro_variations = []
         self._sections = []
         self._dynamic_clips = []
-        
+
         for idx, clip_slot in enumerate(self._config_track.clip_slots):
             row_type = get_type(self._song.scenes[idx].name)
             config_clip = None
@@ -133,9 +133,24 @@ class Module(ModuliveComponent):
 
     def get_macro_variation(self, idx):
         """Get macro_variation with index"""
-        if len(self._macro_variations) <= idx:
+        mv = self.get_macro_variations()
+        if len(mv) <= idx:
             return None
-        return self._macro_variations[idx]
+        return mv[idx]
+    
+    def get_macro_variation_by_name(self, name):
+        """."""
+        for mv in self._macro_variations:
+            if mv and mv.get_name() == name:
+                return mv
+        return None
+    
+    def get_active_macro_variation(self):
+        """."""
+        for mv in self._macro_variations:
+            if mv and mv.get_is_active():
+                return mv
+        return None
 
     def get_active_section(self):
         """
@@ -148,13 +163,6 @@ class Module(ModuliveComponent):
         for section in self._sections:
             if section and section.get_is_triggered():
                 return section
-        return None
-
-    def get_active_macro_variation(self):
-        """."""
-        for mv in self._macro_variations:
-            if mv and mv.get_is_active():
-                return mv
         return None
 
     @catch_exception
@@ -170,6 +178,8 @@ class Module(ModuliveComponent):
                         if chain.name is mapping:
                             return chain
         return None
+
+    #TODO: consolidate these GETs
 
     @catch_exception
     def get_dynamic_clips(self):
@@ -193,6 +203,29 @@ class Module(ModuliveComponent):
                 if dynamic_clip.get_name() == chain.name:
                     dync[i] = dynamic_clip
         return dync
+    
+    @catch_exception
+    def get_macro_variations(self):
+        """Get a list of macro variations for the active mapping"""
+        mv = [None, None, None, None]
+
+        mapping = self._get_current_mapping()
+        if not mapping:
+            return mv
+
+        clips_device = None
+        for device in mapping.devices:
+            if device.name == "__MACRO-VARIATIONS__":
+                clips_device = device
+
+        for i, chain in enumerate(clips_device.chains):
+            if chain.name == "_":
+                continue
+
+            for macro_variation in self._macro_variations:
+                if macro_variation.get_name() == chain.name:
+                    mv[i] = macro_variation
+        return mv
 
     @catch_exception
     def get_params(self):
@@ -253,7 +286,7 @@ class Module(ModuliveComponent):
             "macro_variations": list(
                 map(
                     lambda mv: (mv.get_state() if mv else None),
-                    self._macro_variations,
+                    self.get_macro_variations(),
                 )
             ),
             "params": list(
@@ -287,7 +320,7 @@ class Module(ModuliveComponent):
         self._log(f"Activating Module [{self.get_name()}]...")
         for track in [self._track] + self._child_tracks:
             activate_track(track)
-        #Set initial params
+        # Set initial params
         if len(self._macro_variations) > 0:
             self._macro_variations[0].ramp(0)
 
@@ -310,15 +343,16 @@ class Module(ModuliveComponent):
             for section in self._sections:
                 if section:
                     section.stop()
-            mv = self.get_active_macro_variation()
-            if mv:
+            for mv_name in self._sections[idx].get_macro_variation_names():
+                mv = self.get_macro_variation_by_name(mv_name)
                 mv.ramp(self._sections[idx].get_quantization())
             self._sections[idx].select()
 
     def select_macro_variation(self, idx):
         """Select Macro Variation at index"""
-        if self._macro_variations[idx]:
-            self._macro_variations[idx].select()
+        mvs = self.get_macro_variations()
+        if mvs[idx]:
+            mvs[idx].select()
 
     def stop_section(self, idx):
         """Select Section at index"""

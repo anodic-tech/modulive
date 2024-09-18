@@ -25,6 +25,9 @@ class ParamRamper(ModuliveComponent):
     def ramp_param(self, param, value, quantization):
         """ramp given param to value before quantization hits"""
 
+        if not param.is_enabled:
+            return
+
         num_beats = get_beats_remaining(self._song, quantization)
 
         for ramping_param in self._ramping_params:

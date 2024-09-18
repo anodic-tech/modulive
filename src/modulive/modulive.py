@@ -202,7 +202,7 @@ class Modulive(ControlSurface):
         for module in self._modules:
             module.deactivate()
         self.rebuild_tree()
-        self.show_message('Reset Modulive Set')
+        self.show_message("Reset Modulive Set")
 
     # Updates
     @debounce(0.001)

@@ -50,6 +50,7 @@ class ClipWrapper(ModuliveComponent):
             return
         for command in self._commands():
             if command == ClipCommandTypes.HOLD:
+                self._clip.legato = 1
                 self.fire()
 
     @catch_exception
