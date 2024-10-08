@@ -30,6 +30,7 @@ color_index_map = {
 
 indices_x = [0, 1, 4, 5, 8, 9, 12]
 indices_y = [2, 3, 6, 7, 10, 11, 15]
+indices_xy = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 15]
 
 
 class ModuliveMFT(ModuliveSurface):
@@ -74,21 +75,29 @@ class ModuliveMFT(ModuliveSurface):
         dynamic_param = self.modulive.get_dynamic_param()
         self._assign_encoder(14, dynamic_param[0], color=dynamic_param[1])
 
-        if self.modulive.get_active_module("X"):
-            params = self.modulive.get_active_module("X").get_params()
-            for i, n in enumerate(indices_x):
-                if params[i]:
-                    self._assign_encoder(
-                        n, params[i]["param"], params[i]["color_index"]
-                    )
+        if self.modulive.get_focused_track():
+            track = self.modulive.get_focused_track()
+            params = get_main_device(track).parameters
+            for i, n in enumerate(indices_xy):
+                if params[i + 1]:
+                    self._assign_encoder(n, params[i + 1], track.color_index)
 
-        if self.modulive.get_active_module("Y"):
-            params = self.modulive.get_active_module("Y").get_params()
-            for i, n in enumerate(indices_y):
-                if params[i]:
-                    self._assign_encoder(
-                        n, params[i]["param"], params[i]["color_index"]
-                    )
+        else:
+            if self.modulive.get_active_module("X"):
+                params = self.modulive.get_active_module("X").get_params()
+                for i, n in enumerate(indices_x):
+                    if params[i]:
+                        self._assign_encoder(
+                            n, params[i]["param"], params[i]["color_index"]
+                        )
+
+            if self.modulive.get_active_module("Y"):
+                params = self.modulive.get_active_module("Y").get_params()
+                for i, n in enumerate(indices_y):
+                    if params[i]:
+                        self._assign_encoder(
+                            n, params[i]["param"], params[i]["color_index"]
+                        )
 
     def _assign_encoder(self, n, param, color=None, min=None, max=None):
         """Assign an encoder to a parameter"""

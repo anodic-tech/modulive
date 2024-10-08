@@ -137,14 +137,14 @@ class Module(ModuliveComponent):
         if len(mv) <= idx:
             return None
         return mv[idx]
-    
+
     def get_macro_variation_by_name(self, name):
         """."""
         for mv in self._macro_variations:
             if mv and mv.get_name() == name:
                 return mv
         return None
-    
+
     def get_active_macro_variation(self):
         """."""
         for mv in self._macro_variations:
@@ -175,11 +175,11 @@ class Module(ModuliveComponent):
             for device in self._config_track.devices:
                 if device.name == "__MAPPINGS__":
                     for chain in device.chains:
-                        if chain.name is mapping:
+                        if chain.name == mapping:
                             return chain
         return None
 
-    #TODO: consolidate these GETs
+    # TODO: consolidate these GETs
 
     @catch_exception
     def get_dynamic_clips(self):
@@ -203,7 +203,7 @@ class Module(ModuliveComponent):
                 if dynamic_clip.get_name() == chain.name:
                     dync[i] = dynamic_clip
         return dync
-    
+
     @catch_exception
     def get_macro_variations(self):
         """Get a list of macro variations for the active mapping"""
@@ -347,6 +347,7 @@ class Module(ModuliveComponent):
                 mv = self.get_macro_variation_by_name(mv_name)
                 mv.ramp(self._sections[idx].get_quantization())
             self._sections[idx].select()
+            self.modulive.focus_track(None)
 
     def select_macro_variation(self, idx):
         """Select Macro Variation at index"""

@@ -52,6 +52,8 @@ class ClipWrapper(ModuliveComponent):
             if command == ClipCommandTypes.HOLD:
                 self._clip.legato = 1
                 self.fire()
+            elif command == ClipCommandTypes.FOCUS:
+                self.modulive.focus_track(self._track)
 
     @catch_exception
     def deselect(self):
@@ -145,3 +147,4 @@ class ClipCommandTypes:  # pylint: disable=too-few-public-methods
     """Clip Commands mappings to readable variables"""
 
     HOLD = "HOLD"
+    FOCUS = "FOCUS"

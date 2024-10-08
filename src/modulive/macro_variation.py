@@ -17,7 +17,7 @@ class MacroVariation(ModuliveComponent):
         self._track_clips = track_clips
         self._active = False
         self._value = 0
-        self._log(f'Creating Macro Variation {self.get_name()}...')
+        self._log(f"Creating Macro Variation {self.get_name()}...")
 
     def get_name(self):
         """Get variation name"""

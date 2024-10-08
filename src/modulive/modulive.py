@@ -30,6 +30,7 @@ class Modulive(ControlSurface):
 
         self._modules = []
         self._active_modules = {"X": None, "Y": None}
+        self._focused_track = None
 
         self._mapping_listeners = []
 
@@ -59,6 +60,7 @@ class Modulive(ControlSurface):
             for m in self._modules:
                 m.disconnect()
             self._modules = []
+            self._focused_track = None
             self._build_tree()
 
     # Getters
@@ -108,6 +110,10 @@ class Modulive(ControlSurface):
             return [get_main_device(self.song().master_track).parameters[2], 61]
         else:
             return [self._variation_knob.get_knob(), 59, 0, 127]
+
+    def get_focused_track(self):
+        """Return focused track"""
+        return self._focused_track
 
     # Actions
 
@@ -203,6 +209,15 @@ class Modulive(ControlSurface):
             module.deactivate()
         self.rebuild_tree()
         self.show_message("Reset Modulive Set")
+
+    @catch_exception
+    def focus_track(self, track):
+        """Show selected track in Ableton and add it to state"""
+        if track:
+            self.song().view.selected_track = track
+            track.view.select_instrument()
+        self._focused_track = track
+        self.broadcast_update()
 
     # Updates
     @debounce(0.001)
