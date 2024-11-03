@@ -7,7 +7,14 @@ from _Framework.ButtonElement import ButtonElement  # type: ignore
 from _Framework.InputControlElement import MIDI_NOTE_TYPE, MIDI_NOTE_ON_STATUS  # type: ignore
 from modulive.param_ramper import ParamRamper
 from modulive.variation_knob import VariationKnob  # type: ignore
-from .utils import catch_exception, debounce, get_main_device, get_type
+from .utils import (
+    catch_exception,
+    debounce,
+    get_main_device,
+    get_name,
+    get_type,
+    route_io,
+)
 from .constants import Types
 from .socket import Socket
 from .module import Module
@@ -207,6 +214,7 @@ class Modulive(ControlSurface):
         self._active_modules = {"X": None, "Y": None}
         for module in self._modules:
             module.deactivate()
+        self.update_routing()
         self.rebuild_tree()
         self.show_message("Reset Modulive Set")
 
@@ -218,6 +226,31 @@ class Modulive(ControlSurface):
             track.view.select_instrument()
         self._focused_track = track
         self.broadcast_update()
+
+    @catch_exception
+    def update_routing(self):
+        """Iterate through every device, set up audio/midi routing"""
+
+        def update_device_routing(device):
+            if get_type(device.name) == Types.MAP and device.class_name == "MxDeviceAudioEffect":
+                target_track_name = get_name(device.name)
+
+                route_io(device.audio_inputs[0], 'No Input')
+                if len(device.audio_inputs) > 1:
+                    route_io(device.audio_inputs[1], target_track_name)
+
+                route_io(device.audio_outputs[0], 'No Output')
+                if len(device.audio_outputs) > 1:
+                    route_io(device.audio_outputs[1], target_track_name)
+
+            if device.can_have_chains:
+                for chain in device.chains:
+                    for subdevice in chain.devices:
+                        update_device_routing(subdevice)
+
+        for track in self.song().tracks:
+            for device in track.devices:
+                update_device_routing(device)
 
     # Updates
     @debounce(0.001)

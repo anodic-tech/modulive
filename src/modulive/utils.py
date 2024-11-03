@@ -177,3 +177,16 @@ def deactivate_track(track):
     device = get_main_device(track)
     if device:
         device.parameters[0].value = 0
+
+
+def route_io(device_io, name):
+    """Route IO to track of given name"""
+
+    matched_type = None
+
+    for type in device_io.available_routing_types:
+        if type.display_name == name:
+            matched_type = type
+
+    if matched_type:
+        device_io.routing_type = matched_type

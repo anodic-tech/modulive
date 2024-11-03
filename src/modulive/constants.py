@@ -8,3 +8,4 @@ class Types:  # pylint: disable=too-few-public-methods
     MACRO_VARIATION = "MV"
     SECTION = "S"
     DYNAMIC_CLIP = "DC"
+    MAP = "Mod"
