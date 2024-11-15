@@ -1,4 +1,5 @@
 """ . """
+import math
 from modulive.scene import Scene
 from .utils import catch_exception, get_arguments
 
@@ -33,3 +34,15 @@ class Section(Scene):
             if clip.get_track() == track:
                 return clip
         return False
+
+    @catch_exception
+    def get_state(self):
+        state = super().get_state()
+        state["length"] = math.floor(
+            (self._config_clip.end_time - self._config_clip.start_marker) / 4
+        )
+        state["position"] = math.floor(
+            math.floor(self._config_clip.playing_position) / 4
+        )
+        state["looping"] = self._config_clip.looping
+        return state

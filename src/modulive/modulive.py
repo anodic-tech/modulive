@@ -232,14 +232,17 @@ class Modulive(ControlSurface):
         """Iterate through every device, set up audio/midi routing"""
 
         def update_device_routing(device):
-            if get_type(device.name) == Types.MAP and device.class_name == "MxDeviceAudioEffect":
+            if (
+                get_type(device.name) == Types.MAP
+                and device.class_name == "MxDeviceAudioEffect"
+            ):
                 target_track_name = get_name(device.name)
 
-                route_io(device.audio_inputs[0], 'No Input')
+                route_io(device.audio_inputs[0], "No Input")
                 if len(device.audio_inputs) > 1:
                     route_io(device.audio_inputs[1], target_track_name)
 
-                route_io(device.audio_outputs[0], 'No Output')
+                route_io(device.audio_outputs[0], "No Output")
                 if len(device.audio_outputs) > 1:
                     route_io(device.audio_outputs[1], target_track_name)
 
