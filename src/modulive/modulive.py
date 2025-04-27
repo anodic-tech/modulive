@@ -56,7 +56,8 @@ class Modulive(ControlSurface):
     def _build_tree(self):
         """Iterate through tracks and build virtual tree. Nonmutative"""
         for track in self.song().tracks:
-            if get_type(track.name) is Types.MODULE:
+            type = get_type(track.name)
+            if type == Types.MODULE or type == Types.EXTERNAL_MODULE:
                 self._modules.append(Module(track))
         self.schedule_message(1, self.broadcast_update)
 

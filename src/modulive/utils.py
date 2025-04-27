@@ -170,6 +170,7 @@ def activate_track(track):
     device = get_main_device(track)
     if device:
         device.parameters[0].value = 1
+    track.mute = 0
 
 
 def deactivate_track(track):
@@ -177,6 +178,7 @@ def deactivate_track(track):
     device = get_main_device(track)
     if device:
         device.parameters[0].value = 0
+    track.mute = 1
 
 
 def route_io(device_io, name):

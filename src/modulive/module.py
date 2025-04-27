@@ -99,6 +99,7 @@ class Module(ModuliveComponent):
 
         self._add_name_and_color_listeners()
         self._add_clip_listeners()
+        self._add_xfade_listener()
 
     @catch_exception
     def _rebuild(self):
@@ -111,6 +112,7 @@ class Module(ModuliveComponent):
         self._dynamic_clips = []
         self._remove_name_and_color_listeners()
         self._remove_clip_listeners()
+        self._remove_xfade_listener()
 
         self._build_tree()
         self._broadcast_update()
@@ -308,6 +310,15 @@ class Module(ModuliveComponent):
             ),
         }
 
+    def get_integrated_tracks(self):
+        """Return all tracks within integrated groups"""
+        tracks = []
+        for track in self._child_tracks:
+            if track.is_grouped:
+                if get_type(track.group_track.name) == Types.INTEGRATED:
+                    tracks.append(track)
+        return tracks
+
     # Set
 
     @catch_exception
@@ -320,6 +331,7 @@ class Module(ModuliveComponent):
         self._log(f"Activating Module [{self.get_name()}]...")
         for track in [self._track] + self._child_tracks:
             activate_track(track)
+        self.toggle_integrated_tracks()
         # Set initial params
         if len(self._macro_variations) > 0:
             self._macro_variations[0].ramp(0)
@@ -331,6 +343,36 @@ class Module(ModuliveComponent):
         self._log(f"Deactivating Module [{self.get_name()}]...")
         self.stop()
         for track in [self._track] + self._child_tracks:
+            deactivate_track(track)
+
+    @catch_exception
+    def toggle_integrated_tracks(self):
+        """Toggle integrated tracks depending on xfade position"""
+        assign = self._track.mixer_device.crossfade_assign
+        xfade = self._song.master_track.mixer_device.crossfader
+        if assign == 0:
+            if xfade.value <= 0:
+                self._midi_action(self.activate_integrated_tracks)
+            else:
+                self._midi_action(self.deactivate_integrated_tracks)
+        elif assign == 2:
+            if xfade.value > 0:
+                self._midi_action(self.activate_integrated_tracks)
+            else:
+                self._midi_action(self.deactivate_integrated_tracks)
+
+    @catch_exception
+    def activate_integrated_tracks(self):
+        """Activate tracks in integration groups"""
+        tracks = self.get_integrated_tracks()
+        for track in tracks:
+            activate_track(track)
+
+    @catch_exception
+    def deactivate_integrated_tracks(self):
+        """Deactivate tracks in integration groups"""
+        tracks = self.get_integrated_tracks()
+        for track in tracks:
             deactivate_track(track)
 
     def stop(self):
@@ -377,6 +419,12 @@ class Module(ModuliveComponent):
             for clip_slot in track.clip_slots:
                 clip_slot.add_has_clip_listener(self._rebuild)
 
+    def _add_xfade_listener(self):
+        """Toggle integration tracks on xfade movement"""
+        self._song.master_track.mixer_device.crossfader.add_value_listener(
+            self.toggle_integrated_tracks
+        )
+
     @catch_exception
     def _remove_name_and_color_listeners(self):
         """Remove track listeners"""
@@ -393,6 +441,13 @@ class Module(ModuliveComponent):
             for clip_slot in track.clip_slots:
                 if clip_slot.has_clip_has_listener(self._rebuild):
                     clip_slot.remove_has_clip_listener(self._rebuild)
+
+    @catch_exception
+    def _remove_xfade_listener(self):
+        """Remove xfade listener"""
+        xfade = self._song.master_track.mixer_device.crossfader
+        if xfade.value_has_listener(self.toggle_integrated_tracks):
+            xfade.remove_value_listener(self.toggle_integrated_tracks)
 
     @catch_exception
     def disconnect(self):
