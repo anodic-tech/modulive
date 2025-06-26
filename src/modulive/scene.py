@@ -32,7 +32,7 @@ class Scene(ModuliveComponent):
     def get_is_triggered(self):
         """Return true if a clip is triggered"""
         for clip in self._clips:
-            if clip.get_is_triggered():
+            if clip.get_is_triggered() and not clip.get_is_playing():
                 return True
         return False
 

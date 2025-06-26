@@ -2,6 +2,7 @@
 from functools import partial
 from .utils import catch_exception, get_commands, get_name
 from .modulive_component import ModuliveComponent
+from threading import Timer
 
 
 class ClipWrapper(ModuliveComponent):
@@ -67,25 +68,34 @@ class ClipWrapper(ModuliveComponent):
                         if active_section
                         else None
                     )
+                    callback = None
+                    triggered_section = self._module.get_triggered_section()
+                    if triggered_section:
+                        callback = triggered_section.get_clip_for_track(
+                            self._track
+                        ).fire
                     if section_clip:
                         section_clip.fire(
                             force_legato=True,
                             quantization=self._clip.launch_quantization,
+                            _q_reset=None,
+                            callback=callback,
                         )
 
     @catch_exception
-    def fire(self, force_legato=False, quantization=None, _q_reset=None):
+    def fire(self, force_legato=False, quantization=None, _q_reset=None, callback=None):
         """
         Fires clip
         force_legato - sets clip as legato, returns to original value after clip is stopped or played
         quantization - set clip quantization and then delays firing until quantization takes effect
         _q-reset - internal parameter to change quantization back after firing
+        callback - function to run after clip is triggered
         """
         if quantization:
             old_value = self._clip.launch_quantization
             self._clip.launch_quantization = quantization
             self._midi_action(
-                partial(self.fire, force_legato=force_legato, _q_reset=old_value)
+                partial(self.fire, force_legato=force_legato, _q_reset=old_value, callback=callback)
             )
             return
 
@@ -96,6 +106,9 @@ class ClipWrapper(ModuliveComponent):
                 self._clip.legato = False
 
             self._trigger_callbacks.append(partial(self._midi_action, reset_legato))
+
+        if callback:
+            self._trigger_callbacks.append(partial(self._midi_action, callback))
 
         self._clip.fire()
 

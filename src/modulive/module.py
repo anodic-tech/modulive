@@ -167,6 +167,15 @@ class Module(ModuliveComponent):
                 return section
         return None
 
+    def get_triggered_section(self):
+        """
+        Get currently triggered section
+        """
+        for section in self._sections:
+            if section and section.get_is_triggered():
+                return section
+        return None
+
     @catch_exception
     def _get_current_mapping(self):
         """Get the chain object correspding to the active mapping"""

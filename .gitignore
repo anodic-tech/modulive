@@ -1,3 +1,6 @@
 .vscode
 .env
 .DS_Store
+pyvenv.cfg
+lib
+bin
